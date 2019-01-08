@@ -1,0 +1,76 @@
+{!css(<!-- place your custom CSS file here -->)}
+
+<p><b>Welcome</b> to the <b>SAT Status Page Manager</b>.</p>
+
+<div class="alert alert-warning">
+    <strong>1</strong> Issue found.
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+        <div class="app-panel-group panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                            Disposition <span class="label label-success pull-right">operational</span>
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <p style="color: #764FA5">Database error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 's.idasd' in 'field list'</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="">
+            <button id="add-microservices" class="btn btn-default"><i class="fa fa-plus"></i> Add another microservices </button>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">Latest Issues</div>
+            <div class="panel-body">
+                <p><b>Penjadwalan</b></p>
+                <p>We are currently investigate a storage problem and trying to fix it.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+        <h4>Past Incidents</h4>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">21, Dec 2018 - A reported partial error on Penjadwalan feature include manage rooms</div>
+            <div class="panel-body">
+                <p><b>On Progress</b> - We are working on backup and restore data. (10:02)</p>
+                <p><b>Identified</b> - We detected an storage failure. (08:32)</p>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">20, Dec 2018</div>
+            <div class="panel-body">
+                <p>No issues</p>
+            </div>
+        </div>
+
+        <div class="">
+            <button class="btn btn-default"><i class="fa fa-plus"></i> Announce another incidents </button>
+        </div>
+
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="text-center">&copy Directorate Information - Universitas Kristen Maranatha</div>
+    <br>
+</div>
+
+{!js(<script src="assets/scripts/manager.js"></script>)}

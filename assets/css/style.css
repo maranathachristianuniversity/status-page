@@ -1,0 +1,12 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+img.resize {
+    height: 50px;
+}
+
+.brand {
+    padding: 5px;
+    margin-right: 20px;
+}
