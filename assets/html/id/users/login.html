@@ -1,11 +1,19 @@
-{!css(<!-- place your custom CSS file here -->)}
-<div class="container">
-    <label for="uname"><b>Username</b></label>
-    <input id="uname" type="text" placeholder="Enter Username" name="uname" required>
+{!css(
+<link href="assets/css/login.css" rel="stylesheet">)}
 
-    <label for="psw"><b>Password</b></label>
-    <input id="psw" type="password" placeholder="Enter Password" name="psw" required>
+<div class="text-center div-login">
+    <p>
+        <!--<label for="uname"><b>Username</b></label>-->
+        <input id="uname" type="text" placeholder="Username" name="uname" required class="form-control">
+    </p>
 
-    <button id="btn-login" type="submit">Login</button>
+    <p>
+        <!--<label for="psw"><b>Password</b></label>-->
+        <input id="psw" type="password" placeholder="Password" name="psw" required class="form-control">
+    </p>
+
+    <button id="btn-login" class="btn btn-primary" type="submit">LOGIN</button>
 </div>
-{!js(<script src="assets/scripts/login.js"></script>)}
+
+{!js(
+<script src="assets/scripts/login.js"></script>)}
