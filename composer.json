@@ -4,11 +4,10 @@
   "license": "MIT",
   "version": "1.1.6",
   "require": {
-    "puko/framework": "dev-,a"
+    "puko/framework": "dev-master"
   },
   "require-dev": {
-    "puko/console": "0.1.0",
-    "phpunit/phpunit": "6.5.13"
+    "puko/console": "0.1.0"
   },
   "minimum-stability": "dev",
   "autoload": {
