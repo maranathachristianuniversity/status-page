@@ -6,29 +6,29 @@
     <base id="gateway" href="{!gateway()}">
 
     <meta charset="UTF-8">
-    <title>{!title}</title>
+    <title>SAT - Admin Status Page</title>
+    <!--<title>{!title}</title>-->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+
     <!--<link rel="stylesheet" href="assets/vendor/select2/css/select2.min.css">-->
     <!--<link rel="stylesheet" href="assets/vendor/select2/css/select2-bootstrap.min.css">-->
     <!--<link rel="stylesheet" href="assets/vendor/toastr/toastr.min.css">-->
     <!--<link rel="stylesheet" href="assets/vendor/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">-->
-    <style>
 
-    </style>
 </head>
 <body onload="loadLocalStorage()">
 <div id="wrapper">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a href="#" class="navbar-left"><img class="img-responsive logo resize brand"
-                                                     src="assets/img/logo-blue.png"></a>
+                <a href="#" class="navbar-left"><img class="img-responsive logo resize brand" src="assets/img/logo-blue.png"></a>
             </div>
             <ul class="nav navbar-nav pull-right">
-                <li><a href="https://maranatha.edu"><i class="fa fa-home"></i></a></li>
+                <!--<li><a href="https://maranatha.edu"><i class="fa fa-home"></i></a></li>-->
+                <li><a id="btn-logout"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
         </div>
     </nav>
@@ -49,6 +49,7 @@
     <script type="text/javascript" src="assets/vendor/moment/moment.js"></script>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
+
 
     {!part(css)}
     {!part(js)}

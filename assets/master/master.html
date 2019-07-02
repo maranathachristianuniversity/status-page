@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/vendor/toastr/toastr.min.css">
     <meta http-equiv="refresh" content="30">
 </head>
 <body onload="loadLocalStorage()">
@@ -21,6 +22,7 @@
                 <a href="#" class="navbar-left"><img class="img-responsive logo resize brand" src="assets/img/logo-blue.png"></a>
             </div>
             <ul class="nav navbar-nav pull-right">
+                <li><a href="login">Login</a></li>
                 <li><a href="https://maranatha.edu"><i class="fa fa-home"></i></a></li>
             </ul>
         </div>
@@ -28,14 +30,9 @@
     <div class="container">
         {CONTENT}
     </div>
-
-    <footer class="col-md-12">
-        <hr>
-        <div class="text-center">&copy Directorate Information - Universitas Kristen Maranatha</div>
-        <br>
-    </footer>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/vendor/toastr/toastr.min.js"></script>
 
     {!part(css)}
     {!part(js)}

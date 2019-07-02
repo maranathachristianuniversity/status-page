@@ -27,7 +27,8 @@ $(function () {
 function loadLocalStorage() {
     if (typeof(Storage) !== "undefined") {
         if (localStorage.getItem("bearer") === null) {
-            window.location = "login";
+            // window.location = "login";
+
         }
     } else {
         alert("Sorry! No 'Browser Storage' support..");
@@ -102,6 +103,24 @@ function loadMicroservices() {
                             default:
                                 labelstatus = "label-success";
                         }
+                        // div += `<div class="panel panel-default">
+                        //     <div class="panel-heading">
+                        //         <h4 class="panel-title">
+                        //             <a data-toggle="collapse" data-parent="#accordion" href="#collapse${v.id}">
+                        //                 ${v.displayname} <span class="label pull-right ${labelstatus}">${v.healthstatus}</span>
+                        //             </a>
+                        //
+                        //         </h4>
+                        //     </div>
+                        //     <div id="collapse${v.id}" class="panel-collapse collapse">
+                        //         <div class="panel-body">
+                        //             <p>${v.description}</p>
+                        //             <hr>
+                        //             ${trace}
+                        //         </div>
+                        //     </div>
+                        // </div>`;
+
                         div += `<div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
@@ -114,8 +133,7 @@ function loadMicroservices() {
                             <div id="collapse${v.id}" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <p>${v.description}</p>
-                                    <hr>
-                                    ${trace}
+                                   
                                 </div>
                             </div>
                         </div>`;
@@ -160,65 +178,76 @@ function loadIncidents() {
                         "isresolved": "1"
                     }),
                     success: function (subData, subTextStatus, subJqXHR) {
-                        $.each(subData.healthstatus, function (x, y) {
-                            if (subData.healthstatus.length > 0) {
-                                $.ajax({
-                                    url: $('base#api').attr('href') + 'incidents/search',
-                                    dataType: 'json',
-                                    type: 'POST',
-                                    data: JSON.stringify({
-                                        "idhealthstatus": subData.healthstatus[0].id,
-                                        "isresolved": "1"
-                                    }),
-                                    contentType: 'application/json',
-                                    success: function (dataIncidents) {
-                                        $.each(dataIncidents, function (k, v) {
-                                            $.each(v, function (k, a) {
-                                                trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
-                                            });
-                                        });
+                        if (subData.healthstatus.length > 0) {
+                            $.each(subData.healthstatus, function (x, y) {
+                                if (subData.healthstatus.length > 0) {
+                                    $.ajax({
+                                        url: $('base#api').attr('href') + 'incidents/search',
+                                        dataType: 'json',
+                                        type: 'POST',
+                                        data: JSON.stringify({
+                                            "idhealthstatus": subData.healthstatus[0].id,
+                                            "isresolved": "1"
+                                        }),
+                                        contentType: 'application/json',
+                                        success: function (dataIncidents) {
+                                            console.log(dataIncidents);
+                                            if (dataIncidents.incidents.length > 0) {
+                                                $.each(dataIncidents, function (k, v) {
+                                                    $.each(v, function (k, a) {
+                                                        trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
+                                                    });
+                                                });
 
-                                        div += `<div class="panel panel-default">
+                                                div += `<div class="panel panel-default">
                                                 <div class="panel-heading">${dataIncidents.incidents[0].postdate} - ${dataIncidents.incidents[0].displayname}</div>
                                                 <div class="panel-body">
                                                     ${trace}
-
                                                 </div>
-                                            </div>`;
-                                        $('.div-incidents').html(div);
-                                    }
-                                });
+                                                </div>`;
+                                                $('.div-incidents').html(div);
+                                            } else {
+                                                $('.div-incidents').html(`<div class="panel-body">No data</div>`);
+                                            }
 
-                                // $.ajax({
-                                //     url: $('base#api').attr('href') + 'incidents/search',
-                                //     dataType: 'json',
-                                //     type: 'POST',
-                                //     data: JSON.stringify({
-                                //         "idhealthstatus": subData.healthstatus[0].id,
-                                //         "isresolved": "0"
-                                //     }),
-                                //     contentType: 'application/json',
-                                //     success: function (dataLatest) {
-                                //         console.log(dataLatest);
-                                //         $.each(dataLatest, function (k, v) {
-                                //             $.each(v, function (k, a) {
-                                //                 trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
-                                //             });
-                                //         });
-                                //
-                                //         divLatest += `<div class="panel panel-default">
-                                //                 <div class="panel-heading">${dataLatest.incidents[0].postdate} - ${dataLatest.incidents[0].displayname}</div>
-                                //                 <div class="panel-body">
-                                //                     ${trace}
-                                //
-                                //                 </div>
-                                //             </div>`;
-                                //         $('.div-latest').html(divLatest);
-                                //     }
-                                // });
 
-                            }
-                        });
+                                        }
+                                    });
+
+                                    // $.ajax({
+                                    //     url: $('base#api').attr('href') + 'incidents/search',
+                                    //     dataType: 'json',
+                                    //     type: 'POST',
+                                    //     data: JSON.stringify({
+                                    //         "idhealthstatus": subData.healthstatus[0].id,
+                                    //         "isresolved": "0"
+                                    //     }),
+                                    //     contentType: 'application/json',
+                                    //     success: function (dataLatest) {
+                                    //         console.log(dataLatest);
+                                    //         $.each(dataLatest, function (k, v) {
+                                    //             $.each(v, function (k, a) {
+                                    //                 trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
+                                    //             });
+                                    //         });
+                                    //
+                                    //         divLatest += `<div class="panel panel-default">
+                                    //                 <div class="panel-heading">${dataLatest.incidents[0].postdate} - ${dataLatest.incidents[0].displayname}</div>
+                                    //                 <div class="panel-body">
+                                    //                     ${trace}
+                                    //
+                                    //                 </div>
+                                    //             </div>`;
+                                    //         $('.div-latest').html(divLatest);
+                                    //     }
+                                    // });
+
+                                }
+                            });
+                        } else {
+                            $('.div-incidents').html(`<div class="panel-body">No data</div>`)
+                        }
+
                     },
                     complete: function (jqXHR, textStatus) {
 
@@ -259,7 +288,6 @@ function loadLatestIssue() {
                     success: function (subData, subTextStatus, subJqXHR) {
                         $.each(subData.healthstatus, function (x, y) {
                             if (subData.healthstatus.length > 0) {
-
                                 $.ajax({
                                     url: $('base#api').attr('href') + 'incidents/search',
                                     dataType: 'json',
@@ -270,7 +298,6 @@ function loadLatestIssue() {
                                     }),
                                     contentType: 'application/json',
                                     success: function (dataLatest) {
-
                                         $.each(dataLatest, function (k, v) {
                                             $.each(v, function (k, a) {
                                                 trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
@@ -286,7 +313,10 @@ function loadLatestIssue() {
                                                     </div>
                                                  </div>`;
                                             $('.div-latest').html(divLatest);
+                                        } else {
+                                            $('.div-latest').html(`<p style="margin: 15px;"><b>No Data</b></p>`);
                                         }
+
 
                                     }
                                 });

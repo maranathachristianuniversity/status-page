@@ -1,5 +1,23 @@
 $(document).ready(function () {
 
+    $('#uname').keypress(function(e) {
+        var key = e.which;
+        if (key == 13) // the enter key code
+        {
+            $('#btn-login').click();
+            return false;
+        }
+    });
+
+    $('#psw').keypress(function(e) {
+        var key = e.which;
+        if (key == 13) // the enter key code
+        {
+            $('#btn-login').click();
+            return false;
+        }
+    });
+
     $('#btn-login').click(function (e) {
         var login = {
             "username": $('#uname').val(),
@@ -12,18 +30,26 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(login),
             success: function (data, textStatus, jqXHR) {
-                if (data.status === "failed") {
-                    notification('error', data.exception.Message);
-                } else {
+                // if (data.status === "failed") {
+                //         toastr.options = {
+                //             "timeOut": "10000"
+                //         };
+                //         toastr['error'](data.exception.Message);
+                //     // notification('error', data.exception.Message);
+                // } else {
                     localStorage.setItem("bearer", data.bearer);
                     localStorage.setItem("intro", "true");
                     window.location = "manager";
-                }
+                // }
             },
             complete: function (jqXHR, textStatus) {
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                notification('error', 'Username atau Password Anda Salah.');
+                toastr.options = {
+                    "timeOut": "10000"
+                };
+                toastr['error'](jqXHR.responseJSON.exception.Message);
+                // console.log(errorThrown);
             },
             statusCode: {
                 200: function () {
@@ -50,11 +76,11 @@ $(document).ready(function () {
 });
 
 function loadLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-        if (localStorage.getItem("bearer") != null) {
-            window.location = "manager";
-        }
-    } else {
-        alert("Sorry! No 'Browser Storage' support..");
-    }
+    // if (typeof(Storage) !== "undefined") {
+    //     if (localStorage.getItem("bearer") != null) {
+    //         window.location = "manager";
+    //     }
+    // } else {
+    //     alert("Sorry! No 'Browser Storage' support..");
+    // }
 }
