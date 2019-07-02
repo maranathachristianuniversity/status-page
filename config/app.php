@@ -1,21 +1,26 @@
 <?php return [
-    'cache' => array(
-        'identifier' => 'pukocache',
+    'const' => [
+        'API' => $_SERVER['API'],
+        'GATEWAY' => $_SERVER['GATEWAY']
+    ],
+    'cache' => [
         'kind' => 'MEMCACHED',
         'expired' => 100,
         'host' => 'localhost',
         'port' => 11211,
-    ),
-    'const' => array(
-        'API' => 'http://10.15.104.99:9102/',
-        'GATEWAY' => 'http://10.15.104.99/'
-    ),
-    'logs' => array(
-        'active' => false,
-        'driver' => 'slack',
-        'url' => '',
-        'username' => 'puko',
-        'emoji' => ':boom:',
-        'level' => 'critical'
-    )
+    ],
+    'logs' => [
+        'slack' => [
+            'url' => $_SERVER['SLACK'],
+            'secure' => '',
+            'username' => 'status-page',
+            'active' => false
+        ],
+        'hook' => [
+            'url' => $_SERVER['HOOK'],
+            'secure' => '',
+            'username' => 'status-page',
+            'active' => false
+        ]
+    ]
 ];

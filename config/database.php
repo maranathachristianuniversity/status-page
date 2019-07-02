@@ -1,9 +1,12 @@
-<?php return [
-    'dbType' => 'mysql',
-    'host' => '10.15.104.99',
-    'user' => 'root',
-    'pass' => 'root',
-    'dbName' => 'master',
-    'port' => 3306,
+<?php
+$db['primary'] = [
+    'dbType' => $_SERVER['DB_TYPE'],
+    'host' => $_SERVER['DB_HOST'],
+    'user' => $_SERVER['DB_USER'],
+    'pass' => $_SERVER['DB_PASS'],
+    'dbName' => $_SERVER['DB_NAME'],
+    'port' => $_SERVER['DB_PORT'],
     'cache' => false,
 ];
+
+return $db;
