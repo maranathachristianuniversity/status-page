@@ -4,14 +4,16 @@
             "controller" => "status",
             "function" => "pages",
             "accept" => [
-                "GET"
+                "GET",
+                "POST"
             ]
         ],
         "manager" => [
             "controller" => "manager",
             "function" => "manager",
             "accept" => [
-                "GET"
+                "GET",
+                "POST"
             ]
         ],
         "login" => [
