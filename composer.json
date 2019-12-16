@@ -4,7 +4,7 @@
   "license": "MIT",
   "version": "1.1.6",
   "require": {
-    "puko/framework": "dev-master"
+    "puko/framework": "1.1.6"
   },
   "require-dev": {
     "puko/console": "dev-master"
