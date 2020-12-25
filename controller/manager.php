@@ -6,11 +6,16 @@ use plugins\controller\StatusPageView;
 
 /**
  * #Master master-manager.html
- * #Value title Hello World
+ * #Value title Manager Page
  */
 class manager extends StatusPageView
 {
 
-    public function manager() {}
+    /**
+     * #Value title Manager Page
+     */
+    public function manager()
+    {
+    }
 
 }

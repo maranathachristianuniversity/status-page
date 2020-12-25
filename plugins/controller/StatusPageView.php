@@ -2,8 +2,8 @@
 
 namespace plugins\controller;
 
-use pukoframework\Framework;
-use pukoframework\middleware\View;
+use satframework\Framework;
+use satframework\middleware\View;
 
 /**
  * #Master master.html
@@ -11,7 +11,14 @@ use pukoframework\middleware\View;
  */
 class StatusPageView extends View
 {
-    public function Parse()
+
+    /**
+     * @param null $data
+     * @param string $template
+     * @param false $templateBinary
+     * @return mixed|string|null
+     */
+    public function Parse($data = null, $template = '', $templateBinary = false)
     {
         if ($this->fn === 'url') {
             return Framework::$factory->getBase() . $this->param;
@@ -25,6 +32,8 @@ class StatusPageView extends View
         if ($this->fn === 'gateway') {
             return $this->getAppConstant('GATEWAY');
         }
+
         return '';
     }
+
 }

@@ -11,6 +11,9 @@ use plugins\controller\StatusPageView;
 class status extends StatusPageView
 {
 
+    /**
+     * #Value title Services
+     */
     public function pages()
     {
     }

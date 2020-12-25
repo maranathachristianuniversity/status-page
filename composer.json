@@ -4,10 +4,10 @@
   "license": "MIT",
   "version": "1.1.6",
   "require": {
-    "puko/framework": "1.1.6"
+    "maranathachristianuniversity/sat-framework": "dev-master"
   },
   "require-dev": {
-    "puko/console": "dev-master"
+    "maranathachristianuniversity/sat-console": "dev-master"
   },
   "minimum-stability": "dev",
   "autoload": {

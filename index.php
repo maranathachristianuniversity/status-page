@@ -1,13 +1,13 @@
 <?php
 /*
  *---------------------------------------------------------------
- * PUKO FRAMEWORK
+ * SAT FRAMEWORK
  *---------------------------------------------------------------
  *
  */
 
-use pukoframework\Framework;
-use pukoframework\config\Factory;
+use satframework\Framework;
+use satframework\config\Factory;
 
 require 'vendor/autoload.php';
 
@@ -34,6 +34,8 @@ if (isset($_SERVER['HTTPS'])) {
 }
 
 $factory = array(
+    'cli_param' => null,
+    'environment' => 'DEV',
     'base' => ($protocol . "://" . $_SERVER['HTTP_HOST'] . "/"),
     'root' => __DIR__,
     'start' => microtime(true)

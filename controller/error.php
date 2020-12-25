@@ -2,7 +2,7 @@
 
 namespace controller;
 
-use pukoframework\middleware\View;
+use satframework\middleware\View;
 
 /**
  * Class error
@@ -24,4 +24,10 @@ class error extends View
     {
     }
 
+    /**
+     * #Value title Maintenance
+     */
+    public function maintenance()
+    {
+    }
 }

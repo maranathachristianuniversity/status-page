@@ -48,5 +48,13 @@
             "GET",
             "POST"
         ]
+    ],
+    "maintenance" => [
+        "controller" => "error",
+        "function" => "maintenance",
+        "accept" => [
+            "GET",
+            "POST"
+        ]
     ]
 ]; return $routes;

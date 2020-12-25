@@ -1,34 +1,20 @@
-function loadLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-        if (localStorage.getItem("bearer") != null) {
-            window.location = "manager";
-        }
-    } else {
-        alert("Sorry! No 'Browser Storage' support..");
+$.ajaxSetup({
+    timeout: 30000,
+    beforeSend: function (xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem("bearer"));
     }
-}
+});
 
 $(function () {
-
-    $.ajaxSetup({
-        timeout: 30000,
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem("bearer"));
-        }
-    });
-
     loadMicroservices();
     loadIncidents();
-
     loadLatestIssue();
-
 });
 
 function loadLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-        if (localStorage.getItem("bearer") === null) {
-            // window.location = "login";
-
+    if (typeof (Storage) !== "undefined") {
+        if (localStorage.getItem("bearer") != null) {
+            window.location = "manager";
         }
     } else {
         alert("Sorry! No 'Browser Storage' support..");
@@ -41,9 +27,9 @@ function loadMicroservices() {
         dataType: 'json',
         type: 'POST',
         data: {},
-        success: function (data, textStatus, jqXHR) {
+        success: function (data) {
             let div = "";
-            var totalissue = 0;
+            let totalissue = 0;
             $.each(data.health, function (k, v) {
                 let trace = "";
                 $.ajax({
@@ -54,7 +40,7 @@ function loadMicroservices() {
                         "idhealth": v.id,
                         "isresolved": 0
                     }),
-                    success: function (subData, subTextStatus, subJqXHR) {
+                    success: function (subData) {
                         totalissue = totalissue + subData.healthstatus.length;
                         $('.total-issue').text(totalissue);
 
@@ -68,7 +54,6 @@ function loadMicroservices() {
                                     json = '';
                                 }
                             }
-                            // let json = JSON.parse(y.problem)[0];
                             if (json.text === undefined) {
                                 trace += `<p><b>${json.pretext}</b></p>
                                     <a class="btn btn-primary mark-issue" id="${subData.healthstatus[0].id}" data-idhealthstatus="${subData.healthstatus[0].id}">Mark issue resolved</a>
@@ -82,8 +67,7 @@ function loadMicroservices() {
                             });
                         });
 
-                        var labelstatus = "label-success";
-
+                        let labelstatus = "";
                         switch (v.healthstatus) {
                             case 'operational':
                                 labelstatus = "label-success";
@@ -102,24 +86,8 @@ function loadMicroservices() {
                                 break;
                             default:
                                 labelstatus = "label-success";
+                                break;
                         }
-                        // div += `<div class="panel panel-default">
-                        //     <div class="panel-heading">
-                        //         <h4 class="panel-title">
-                        //             <a data-toggle="collapse" data-parent="#accordion" href="#collapse${v.id}">
-                        //                 ${v.displayname} <span class="label pull-right ${labelstatus}">${v.healthstatus}</span>
-                        //             </a>
-                        //
-                        //         </h4>
-                        //     </div>
-                        //     <div id="collapse${v.id}" class="panel-collapse collapse">
-                        //         <div class="panel-body">
-                        //             <p>${v.description}</p>
-                        //             <hr>
-                        //             ${trace}
-                        //         </div>
-                        //     </div>
-                        // </div>`;
 
                         div += `<div class="panel panel-default">
                             <div class="panel-heading">
@@ -127,13 +95,11 @@ function loadMicroservices() {
                                     <a data-toggle="collapse" data-parent="#accordion" href="#collapse${v.id}">
                                         ${v.displayname} <span class="label pull-right ${labelstatus}">${v.healthstatus}</span>
                                     </a>
-                                  
                                 </h4>
                             </div>
                             <div id="collapse${v.id}" class="panel-collapse collapse">
                                 <div class="panel-body">
                                     <p>${v.description}</p>
-                                   
                                 </div>
                             </div>
                         </div>`;
@@ -141,20 +107,14 @@ function loadMicroservices() {
                         $('.app-panel-group').html(div);
 
                     },
-                    complete: function (jqXHR, textStatus) {
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-
+                    error: function (jqXHR) {
+                        notification('error', jqXHR.responseJSON.exception.Message);
                     }
                 });
             });
         },
-        complete: function (jqXHR, textStatus) {
-
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-
+        error: function (jqXHR) {
+            notification('error', jqXHR.responseJSON.exception.Message);
         }
     });
 }
@@ -165,8 +125,8 @@ function loadIncidents() {
         dataType: 'json',
         type: 'POST',
         data: {},
-        success: function (data, textStatus, jqXHR) {
-            let div = "", divLatest = "";
+        success: function (data) {
+            let div = "";
             $.each(data.health, function (k, v) {
                 let trace = "";
                 $.ajax({
@@ -175,9 +135,9 @@ function loadIncidents() {
                     type: 'POST',
                     data: JSON.stringify({
                         "idhealth": v.id,
-                        "isresolved": "1"
+                        "isresolved": 1
                     }),
-                    success: function (subData, subTextStatus, subJqXHR) {
+                    success: function (subData) {
                         if (subData.healthstatus.length > 0) {
                             $.each(subData.healthstatus, function (x, y) {
                                 if (subData.healthstatus.length > 0) {
@@ -187,11 +147,10 @@ function loadIncidents() {
                                         type: 'POST',
                                         data: JSON.stringify({
                                             "idhealthstatus": subData.healthstatus[0].id,
-                                            "isresolved": "1"
+                                            "isresolved": 1
                                         }),
                                         contentType: 'application/json',
                                         success: function (dataIncidents) {
-                                            console.log(dataIncidents);
                                             if (dataIncidents.incidents.length > 0) {
                                                 $.each(dataIncidents, function (k, v) {
                                                     $.each(v, function (k, a) {
@@ -200,69 +159,33 @@ function loadIncidents() {
                                                 });
 
                                                 div += `<div class="panel panel-default">
-                                                <div class="panel-heading">${dataIncidents.incidents[0].postdate} - ${dataIncidents.incidents[0].displayname}</div>
-                                                <div class="panel-body">
-                                                    ${trace}
-                                                </div>
-                                                </div>`;
+                                                            <div class="panel-heading">
+                                                                ${dataIncidents.incidents[0].postdate} - ${dataIncidents.incidents[0].displayname}
+                                                            </div>
+                                                            <div class="panel-body">
+                                                                ${trace}
+                                                            </div>
+                                                        </div>`;
                                                 $('.div-incidents').html(div);
                                             } else {
                                                 $('.div-incidents').html(`<div class="panel-body">No data</div>`);
                                             }
-
-
                                         }
                                     });
-
-                                    // $.ajax({
-                                    //     url: $('base#api').attr('href') + 'incidents/search',
-                                    //     dataType: 'json',
-                                    //     type: 'POST',
-                                    //     data: JSON.stringify({
-                                    //         "idhealthstatus": subData.healthstatus[0].id,
-                                    //         "isresolved": "0"
-                                    //     }),
-                                    //     contentType: 'application/json',
-                                    //     success: function (dataLatest) {
-                                    //         console.log(dataLatest);
-                                    //         $.each(dataLatest, function (k, v) {
-                                    //             $.each(v, function (k, a) {
-                                    //                 trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
-                                    //             });
-                                    //         });
-                                    //
-                                    //         divLatest += `<div class="panel panel-default">
-                                    //                 <div class="panel-heading">${dataLatest.incidents[0].postdate} - ${dataLatest.incidents[0].displayname}</div>
-                                    //                 <div class="panel-body">
-                                    //                     ${trace}
-                                    //
-                                    //                 </div>
-                                    //             </div>`;
-                                    //         $('.div-latest').html(divLatest);
-                                    //     }
-                                    // });
-
                                 }
                             });
                         } else {
                             $('.div-incidents').html(`<div class="panel-body">No data</div>`)
                         }
-
                     },
-                    complete: function (jqXHR, textStatus) {
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-
+                    error: function (jqXHR) {
+                        notification('error', jqXHR.responseJSON.exception.Message);
                     }
                 });
             });
         },
-        complete: function (jqXHR, textStatus) {
-
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-
+        error: function (jqXHR) {
+            notification('error', jqXHR.responseJSON.exception.Message);
         }
     });
 }
@@ -273,7 +196,7 @@ function loadLatestIssue() {
         dataType: 'json',
         type: 'POST',
         data: {},
-        success: function (data, textStatus, jqXHR) {
+        success: function (data) {
             let divLatest = "";
             $.each(data.health, function (k, v) {
                 let trace = "";
@@ -282,10 +205,9 @@ function loadLatestIssue() {
                     dataType: 'json',
                     type: 'POST',
                     data: JSON.stringify({
-                        "idhealth": v.id,
-                        // "isresolved": "1"
+                        "idhealth": v.id
                     }),
-                    success: function (subData, subTextStatus, subJqXHR) {
+                    success: function (subData) {
                         $.each(subData.healthstatus, function (x, y) {
                             if (subData.healthstatus.length > 0) {
                                 $.ajax({
@@ -294,7 +216,7 @@ function loadLatestIssue() {
                                     type: 'POST',
                                     data: JSON.stringify({
                                         "idhealthstatus": subData.healthstatus[0].id,
-                                        "isresolved": "0"
+                                        "isresolved": 0
                                     }),
                                     contentType: 'application/json',
                                     success: function (dataLatest) {
@@ -316,29 +238,20 @@ function loadLatestIssue() {
                                         } else {
                                             $('.div-latest').html(`<p style="margin: 15px;"><b>No Data</b></p>`);
                                         }
-
-
                                     }
                                 });
 
                             }
                         });
-
                     },
-                    complete: function (jqXHR, textStatus) {
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-
+                    error: function (jqXHR) {
+                        notification('error', jqXHR.responseJSON.exception.Message);
                     }
                 });
             });
         },
-        complete: function (jqXHR, textStatus) {
-
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-
+        error: function (jqXHR) {
+            notification('error', jqXHR.responseJSON.exception.Message);
         }
     });
 }

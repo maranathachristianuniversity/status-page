@@ -1,17 +1,18 @@
-.div-login{
+.div-login {
     width: 385px;
     min-height: 200px;
     margin: auto;
-    margin-top: 20%;
+    margin-top: 18%;
     padding: 40px;
-    /*background-color:rgba(0,103,172,0.9);*/
     background-color: #f5f5f5;
     border-radius: 10px;
     border: solid #dddddd 1px;
 }
-#btn-login, input{
+
+#btn-login, input {
     width: 100%;
 }
-input{
+
+input {
     margin-bottom: 15px;
 }
