@@ -17,9 +17,10 @@ $(document).ready(function () {
     });
 
     $('#btn-login').click(function (e) {
+        e.preventDefault();
         let login = {
-            "username": $('#uname').val(),
-            "password": $('#psw').val()
+            username: $('#uname').val(),
+            password: $('#psw').val()
         };
         $.ajax({
             url: $('base#gateway').attr('href') + 'login',
@@ -28,18 +29,38 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify(login),
             success: function (data) {
-                localStorage.setItem("bearer", data.bearer);
-                localStorage.setItem("intro", "true");
+                //check permissions
+                $.ajaxSetup({
+                    timeout: 30000,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + data.bearer);
+                    }
+                });
+                $.ajax({
+                    url: $('base#gateway').attr('href') + 'data',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    error: function (jqXHR) {
+                        notification('error', jqXHR.responseJSON.exception.Message);
+                    },
+                    success: function (response) {
+                        let res = response.user;
+                        let user = res.user;
+                        let permissions = res.permissions;
 
-                window.location = "manager";
+                        if (permissions.includes('SDV')) {
+                            localStorage.setItem("bearer", data.bearer);
+                            localStorage.setItem("intro", "true");
+                            window.location = "manager";
+                        } else {
+                            notification('error', `Maaf ${user.displayname}, user anda ${user.nipnrp} tidak diberikan akses untuk mengakses fungsi ini.`);
+                        }
+                    }
+                });
             },
-            complete: function (jqXHR, textStatus) {
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                toastr.options = {
-                    "timeOut": "10000"
-                };
-                toastr['error'](jqXHR.responseJSON.exception.Message);
+            error: function (jqXHR) {
+                notification('error', jqXHR.responseJSON.exception.Message);
             },
             statusCode: {
                 400: function () {
@@ -61,4 +82,12 @@ function loadLocalStorage() {
     } else {
         alert("Sorry! No 'Browser Storage' support...");
     }
+}
+
+function notification(type, message) {
+    toastr.options = {
+        timeOut: 10000,
+        onclick: function () {}
+    };
+    toastr[type](message);
 }

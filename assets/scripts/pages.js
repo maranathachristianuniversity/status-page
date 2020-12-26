@@ -133,11 +133,8 @@ $(function () {
 
 function notification(type, message) {
     toastr.options = {
-        "timeOut": "10000",
-        "onclick": function () {
-            alert('onclick callback');
-        }
+        timeOut: 10000,
+        onclick: function () {}
     };
-
     toastr[type](message);
 }
