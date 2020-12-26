@@ -4,20 +4,21 @@
 {!css(<link href="assets/vendor/toastr/toastr.min.css" rel="stylesheet">)}
 {!css(<link href="assets/vendor/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet">)}
 
-<p><b>Welcome</b> to the <b>SAT Status Page Manager</b>.</p>
-
+<p>
+    <b>Welcome!</b> to the SAT Core page status. Here you will find real-time information about status of our services.
+</p>
 <div class="alert alert-warning">
-    <strong class="total-issue">1</strong> Issue found.
+    <strong class="total-issue">-</strong> Issue found from <strong class="total-service">-</strong> services.
 </div>
 
 <div class="row">
     <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
         <div class="app-panel-group panel-group div-microservices" id="accordion">
-            <div class="panel panel-default">
-            </div>
+            <div class="panel panel-default"></div>
         </div>
-        <div class="">
-            <button id="add-microservices" class="btn btn-default"><i class="fa fa-plus"></i> Add another microservices
+        <div>
+            <button id="add-microservices" class="btn btn-default">
+                <i class="fa fa-plus"></i> Add another microservices
             </button>
         </div>
         <div style="margin-top:30px;">
@@ -25,7 +26,6 @@
             <div class="div-incidents">
                 <div class="panel panel-default"></div>
             </div>
-
         </div>
     </div>
     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -41,7 +41,6 @@
 {!js(<script src="assets/vendor/bootbox/bootbox.min.js"></script>)}
 {!js(<script src="assets/vendor/select2/js/select2.full.min.js"></script>)}
 {!js(<script src="assets/vendor/toastr/toastr.min.js"></script>)}
-{!js(<script src="assets/vendor/moment/moment.js"></script>)}
 {!js(<script src="assets/vendor/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>)}
 
 {!js(<script src="assets/scripts/manager.js"></script>)}
