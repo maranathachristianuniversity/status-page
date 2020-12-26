@@ -47,6 +47,12 @@ $(function () {
                                         <a id="${val.id}" class="expand-service" data-toggle="collapse" data-parent="#accordion" href="#collapse${val.id}">
                                             ${val.displayname} <span class="label pull-right ${labelstatus}">${val.healthstatus}</span>
                                         </a>
+                                        <a href="javascript:void(0)" class="editMicroservices" style="margin-left:10px;" title="Edit Microservices" id="${val.id}">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                        <a href="javascript:void(0)" class="deleteMicroservices" style="margin-left:5px;" title="Delete Microservices" id="${val.id}">
+                                            <i class="fa fa-trash"></i>
+                                        </a> 
                                     </h4>
                                 </div>
                                 <div id="collapse${val.id}" class="panel-collapse collapse">
@@ -132,10 +138,47 @@ $(function () {
     });
 
     //on expand error display
-    //todo: later doing
     $(document).on('click', '.expand-service', function (evt) {
         evt.preventDefault();
+        let id = $(this).attr('id');
+        let area_expanded = $(this).attr('aria-expanded');
+        if (area_expanded === 'true') {
+            $.ajax({
+                url: $('base#api').attr('href') + 'healthstatus/search',
+                dataType: 'json',
+                type: 'POST',
+                data: JSON.stringify({
+                    idhealth: id,
+                    isresolved: 0
+                }),
+                success: function (data) {
+                    let healthstatus = data.healthstatus;
+                    let trace = ``;
+                    $.each(healthstatus, function (x, y) {
+                        let problem = JSON.parse(y.problem);
+                        $.each(problem, function (a, b) {
+                            trace += `<p><b>${y.iteration}x error | ${b.text}</b></p>`;
+                            trace += `<pre>`;
+                            $.each(b.fields, function (c, d) {
+                                trace += `<p><b>${d.value}</b></p>`;
+                            });
+                            trace += `</pre>`;
+                        });
+                        trace += `<a class="btn btn-primary mark-issue" id="${y.id}" data-idhealthstatus="${y.id}" style="margin-right: 15px">Mark issue resolved</a>`;
+                        trace += `<a class="btn btn-default add-incidents" id="${y.id}" style="margin-right: 15px">Add incidents notes</a>`;
+                    });
+                    if (healthstatus.length > 0) {
+                        $(`.expand-service-${id}`).html(trace);
+                    } else {
+                        $(`.expand-service-${id}`).html(`Modules working perfectly!`);
+                    }
 
+                },
+                error: function (jqXHR) {
+                    notification('error', jqXHR.responseJSON.exception.Message);
+                }
+            });
+        }
     });
 
     $('#add-microservices').on('click', function () {
@@ -165,13 +208,12 @@ $(function () {
         let add_service_box = bootbox.dialog({
             title: 'Lengkapi Data Module / Microservices',
             message: forms,
-            size: 'medium',
+            size: 'small',
             buttons: {
                 cancel: {
                     label: "Batalkan",
                     className: 'btn-default',
-                    callback: function () {
-                    }
+                    callback: function () {}
                 },
                 ok: {
                     label: "Simpan",
@@ -192,10 +234,7 @@ $(function () {
                             data: JSON.stringify(create),
                             success: function (data, textStatus, jqXHR) {
                                 notification('success', "Microservices berhasil ditambah");
-
                                 add_service_box.modal('hide');
-
-                                loadMicroservices();
                             },
                             error: function (jqXHR) {
                                 notification('error', jqXHR.responseJSON.exception.Message);
@@ -214,7 +253,7 @@ $(function () {
         });
     });
 
-    $('.div-microservices').on('click', '.editMicroservices', function (e) {
+    $('.div-microservices').on('click', '.editMicroservices', function () {
         let x = $(this).attr('id');
         $.ajax({
             url: $('base#api').attr('href') + 'health/' + x,
@@ -248,7 +287,7 @@ $(function () {
                 let edit_box = bootbox.dialog({
                     title: 'Ubah Data',
                     message: forms,
-                    size: 'large',
+                    size: 'small',
                     buttons: {
                         cancel: {
                             label: "Batalkan",
@@ -261,7 +300,7 @@ $(function () {
                             className: 'btn-primary',
                             callback: function (evt) {
                                 evt.preventDefault();
-                                var update = {
+                                let update = {
                                     "appidentifier": $('#appidentifierUpdate').val(),
                                     "displayname": $('#displaynameUpdate').val(),
                                     "healthstatus": $('#healthstatusUpdate').val(),
@@ -276,9 +315,7 @@ $(function () {
                                     data: JSON.stringify(update),
                                     success: function (data) {
                                         notification('success', "Microservices berhasil diubah");
-
                                         edit_box.modal('hide');
-                                        loadMicroservices();
                                     },
                                     error: function (jqXHR) {
                                         notification('error', jqXHR.responseJSON.exception.Message);
@@ -291,32 +328,29 @@ $(function () {
                 });
                 edit_box.init(function () {
                     $('.bootbox').removeAttr('tabindex');
-
                     $('#healthstatusUpdate').select2({
                         placeholder: 'Select an option'
                     });
                     $('#healthstatusUpdate').val(data.health.healthstatus).change();
                 });
-
             },
-            error: function (data) {
-
+            error: function (jqXHR) {
+                notification('error', jqXHR.responseJSON.exception.Message);
             }
         });
     });
 
-    $('.div-microservices').on('click', '.deleteMicroservices', function (e) {
+    $('.div-microservices').on('click', '.deleteMicroservices', function () {
         let x = $(this).attr('id');
         let delete_box = bootbox.dialog({
             title: 'Hapus Data',
-            message: 'Apakah Anda yakin ingin menghapus data ini ?',
+            message: 'Apakah Anda yakin ingin menghapus data ini?',
             size: 'small',
             buttons: {
                 cancel: {
                     label: "Batalkan",
                     className: 'btn-default',
-                    callback: function () {
-                    }
+                    callback: function () {}
                 },
                 ok: {
                     label: "Hapus",
@@ -328,12 +362,11 @@ $(function () {
                             dataType: 'json',
                             type: 'GET',
                             contentType: 'application/json',
-                            success: function (data, textStatus, jqXHR) {
+                            success: function (data) {
                                 if (data.status === "failed") {
                                     notification('error', data.exception.Message);
                                 } else {
                                     notification('success', "Microservices berhasil dihapus");
-                                    loadMicroservices();
                                     delete_box.modal('hide');
                                 }
                             },
@@ -348,7 +381,7 @@ $(function () {
         });
     });
 
-    $('.div-microservices').on('click', '.mark-issue', function (e) {
+    $('.div-microservices').on('click', '.mark-issue', function () {
         let x = $(this).attr('id');
         let idhealthstatus = $(this).attr('data-idhealthstatus');
 
@@ -363,14 +396,11 @@ $(function () {
                     dataType: 'json',
                     type: 'POST',
                     data: {
-                        "idhealth": x,
-                        "isresolved": "1"
+                        idhealth: x,
+                        isresolved: 1
                     },
                     success: function (data) {
                         notification('success', "Issue resolved.");
-                        loadIncidents();
-                        loadMicroservices();
-                        loadLatestIssue();
                     },
                     error: function (jqXHR) {
                         notification('error', jqXHR.responseJSON.exception.Message);
@@ -380,7 +410,7 @@ $(function () {
         });
     });
 
-    $('.div-microservices').on('click', '.add-incidents', function (e) {
+    $('.div-microservices').on('click', '.add-incidents', function () {
         let x = $(this).attr('id');
         let forms = `<div class="form-group">
                         <div class="control-label">Post Date:</div>
@@ -405,9 +435,9 @@ $(function () {
                      </div>`;
 
         let incidents_box = bootbox.dialog({
-            title: 'Masukkan Data Incidents',
+            title: 'Tambahkan Catatan Kesalahan',
             message: forms,
-            size: 'medium',
+            size: 'small',
             buttons: {
                 cancel: {
                     label: "Batalkan",
@@ -420,11 +450,11 @@ $(function () {
                     className: 'btn-primary',
                     callback: function (evt) {
                         evt.preventDefault();
-                        var create = {
-                            "idhealthstatus": x,
-                            "postdate": $('input[name=postdate]').val(),
-                            "message": $('#message').val(),
-                            "tag": $('#tagIncidents').val()
+                        let create = {
+                            idhealthstatus: x,
+                            postdate: $('input[name=postdate]').val(),
+                            message: $('#message').val(),
+                            tag: $('#tagIncidents').val()
                         };
                         $.ajax({
                             url: $('base#api').attr('href') + 'incidents/create',
@@ -435,7 +465,6 @@ $(function () {
                             success: function (data) {
                                 notification('success', "Incidents berhasil ditambah");
                                 incidents_box.modal('hide');
-                                loadIncidents();
                             },
                             error: function (jqXHR) {
                                 notification('error', jqXHR.responseJSON.exception.Message);
@@ -460,7 +489,7 @@ $(function () {
         });
     });
 
-    $('.div-incidents').on('click', '.editIncidents', function (e) {
+    $('.div-incidents').on('click', '.editIncidents', function () {
         let x = $(this).attr('id');
         $.ajax({
             url: $('base#api').attr('href') + 'incidents/' + x,
@@ -495,7 +524,7 @@ $(function () {
                 let incidents_box_edit = bootbox.dialog({
                     title: 'Ubah Data',
                     message: forms,
-                    size: 'large', //small atau remove = medium
+                    size: 'small',
                     buttons: {
                         cancel: {
                             label: "Batalkan",
@@ -552,7 +581,7 @@ $(function () {
         });
     });
 
-    $('.div-incidents').on('click', '.deleteIncidents', function (e) {
+    $('.div-incidents').on('click', '.deleteIncidents', function () {
         let x = $(this).attr('id');
         let delete_incidents_box = bootbox.dialog({
             title: 'Hapus Data',
@@ -578,10 +607,8 @@ $(function () {
                             success: function (data) {
                                 if (data.status === "failed") {
                                     notification('error', data.exception.Message);
-                                }
-                                else {
+                                } else {
                                     notification('success', "Incidents berhasil dihapus");
-                                    loadIncidents();
                                     delete_incidents_box.modal('hide');
                                 }
                             },
@@ -611,256 +638,6 @@ function loadLocalStorage() {
     } else {
         alert("Sorry! No 'Browser Storage' support..");
     }
-}
-
-function loadMicroservices() {
-    $.ajax({
-        url: $('base#api').attr('href') + 'health/search',
-        dataType: 'json',
-        type: 'POST',
-        data: {},
-        success: function (data, textStatus, jqXHR) {
-            let div = "";
-            let totalissue = 0;
-            $.each(data.health, function (k, v) {
-                let trace = "";
-                $.ajax({
-                    url: $('base#api').attr('href') + 'healthstatus/search',
-                    dataType: 'json',
-                    type: 'POST',
-                    data: JSON.stringify({
-                        "idhealth": v.id,
-                        "isresolved": 0
-                    }),
-                    success: function (subData) {
-                        totalissue = totalissue + subData.healthstatus.length;
-                        $('.total-issue').text(totalissue);
-
-                        $.each(subData.healthstatus, function (x, y) {
-                            let json = '';
-                            if (y.problem !== undefined || y.problem !== null || y.problem !== "null") {
-                                json = JSON.parse(y.problem);
-                                if (json.length > 0) {
-                                    json = json[0];
-                                } else {
-                                    json = '';
-                                }
-                            }
-
-                            if (json.text === undefined) {
-                                trace += `<hr><p><b>${json.pretext}</b></p>
-                                    <a class="btn btn-primary mark-issue" id="${subData.healthstatus[0].id}" data-idhealthstatus="${subData.healthstatus[0].id}">Mark issue resolved</a>
-                                    <a class="btn btn-default add-incidents" id="${subData.healthstatus[0].id}">Add incidents notes</a>`;
-                            } else {
-                                trace += `<hr><p><b>${json.text} ${json.pretext}</b></p>`;
-                            }
-
-                            $.each(json.fields, function (a, b) {
-                                if (json.fields.length === a + 1) {
-                                    trace += `<pre>${b.title} - ${b.value}</pre>
-                                    <a class="btn btn-primary mark-issue" id="${subData.healthstatus[0].id}" data-idhealthstatus="${subData.healthstatus[0].id}">Mark issue resolved</a>
-                                    <a class="btn btn-default add-incidents" id="${subData.healthstatus[0].id}">Add incidents notes</a>`;
-                                } else {
-                                    trace += `<pre>${b.title} - ${b.value}</pre>`;
-                                }
-                            });
-                        });
-
-                        let labelstatus = "";
-                        switch (v.healthstatus) {
-                            case 'operational':
-                                labelstatus = "label-success";
-                                break;
-                            case 'warning':
-                                labelstatus = "label-warning";
-                                break;
-                            case 'error':
-                                labelstatus = "label-danger";
-                                break;
-                            case 'deprecated':
-                                labelstatus = "label-deprecated";
-                                break;
-                            case 'off':
-                                labelstatus = "label-default";
-                                break;
-                            default:
-                                labelstatus = "label-success";
-                        }
-
-                        div += `<div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse${v.id}">
-                                                ${v.displayname} <span class="label pull-right ${labelstatus}">${v.healthstatus}</span>
-                                            </a>
-                                            <a href="javascript:void(0)" class="editMicroservices" style="margin-left:10px;" title="Edit Microservices" id="${v.id}">
-                                                <i class="fa fa-pencil"></i>
-                                            </a>
-                                            <a href="javascript:void(0)" class="deleteMicroservices" style="margin-left:5px;" title="Delete Microservices" id="${v.id}">
-                                                <i class="fa fa-trash"></i>
-                                            </a> 
-                                        </h4>
-                                    </div>
-                                    <div id="collapse${v.id}" class="panel-collapse collapse">
-                                        <div class="panel-body">
-                                            <p>${v.description}</p>
-                                          
-                                            ${trace}
-                                        </div>
-                                    </div>
-                                </div>`;
-
-                        $('.app-panel-group').html(div);
-                    },
-                    error: function (jqXHR) {
-                        notification('error', jqXHR.responseJSON.exception.Message);
-                    }
-                });
-            });
-        },
-        error: function (jqXHR) {
-            notification('error', jqXHR.responseJSON.exception.Message);
-        }
-    });
-}
-
-function loadIncidents() {
-    $.ajax({
-        url: $('base#api').attr('href') + 'health/search',
-        dataType: 'json',
-        type: 'POST',
-        data: {},
-        success: function (data) {
-            let div = "";
-            let divLatest = "";
-            $.each(data.health, function (k, v) {
-                let trace = "";
-                $.ajax({
-                    url: $('base#api').attr('href') + 'healthstatus/search',
-                    dataType: 'json',
-                    type: 'POST',
-                    data: JSON.stringify({
-                        "idhealth": v.id,
-                        "isresolved": "1"
-                    }),
-                    success: function (subData) {
-                        if (subData.healthstatus.length > 0) {
-                            $.each(subData.healthstatus, function (x, y) {
-                                if (subData.healthstatus.length > 0) {
-                                    $.ajax({
-                                        url: $('base#api').attr('href') + 'incidents/search',
-                                        dataType: 'json',
-                                        type: 'POST',
-                                        data: JSON.stringify({
-                                            "idhealthstatus": subData.healthstatus[0].id,
-                                            "isresolved": "1"
-                                        }),
-                                        contentType: 'application/json',
-                                        success: function (dataIncidents) {
-                                            if (dataIncidents.incidents.length > 0) {
-                                                $.each(dataIncidents, function (k, v) {
-                                                    $.each(v, function (k, a) {
-                                                        trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
-                                                    });
-                                                });
-
-                                                div += `<div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                ${dataIncidents.incidents[0].postdate} - ${dataIncidents.incidents[0].displayname}
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                ${trace}
-                                                            </div>
-                                                        </div>`;
-                                                $('.div-incidents').html(div);
-                                            } else {
-                                                $('.div-incidents').html(`<div class="panel-body">No data</div>`);
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                        } else {
-                            $('.div-incidents').html(`<div class="panel-body">No data</div>`)
-                        }
-
-                    },
-                    error: function (jqXHR) {
-                        notification('error', jqXHR.responseJSON.exception.Message);
-                    }
-                });
-            });
-        },
-        error: function (jqXHR) {
-            notification('error', jqXHR.responseJSON.exception.Message);
-        }
-    });
-}
-
-function loadLatestIssue() {
-    $.ajax({
-        url: $('base#api').attr('href') + 'health/search',
-        dataType: 'json',
-        type: 'POST',
-        data: {},
-        success: function (data) {
-            let divLatest = "";
-            $.each(data.health, function (k, v) {
-                let trace = "";
-                $.ajax({
-                    url: $('base#api').attr('href') + 'healthstatus/search',
-                    dataType: 'json',
-                    type: 'POST',
-                    data: JSON.stringify({
-                        "idhealth": v.id
-                    }),
-                    success: function (subData) {
-                        $.each(subData.healthstatus, function (x, y) {
-                            if (subData.healthstatus.length > 0) {
-                                $.ajax({
-                                    url: $('base#api').attr('href') + 'incidents/search',
-                                    dataType: 'json',
-                                    type: 'POST',
-                                    data: JSON.stringify({
-                                        "idhealthstatus": subData.healthstatus[0].id,
-                                        "isresolved": "0"
-                                    }),
-                                    contentType: 'application/json',
-                                    success: function (dataLatest) {
-                                        $.each(dataLatest, function (k, v) {
-                                            $.each(v, function (k, a) {
-                                                trace += `<p><b>${a.tag}</b> - ${a.message}</p>`;
-                                            });
-                                        });
-
-                                        if (dataLatest.incidents.length > 0) {
-                                            divLatest +=
-                                                `<div class="div-latest">
-                                                    <div class="panel-body">
-                                                        <p><b>${dataLatest.incidents[dataLatest.incidents.length - 1].displayname}</b></p>
-                                                        <p>${dataLatest.incidents[dataLatest.incidents.length - 1].message}</p>
-                                                    </div>
-                                                 </div>`;
-                                            $('.div-latest').html(divLatest);
-                                        } else {
-                                            $('.div-latest').html(`<p style="margin: 15px;"><b>No Data</b></p>`);
-                                        }
-                                    }
-                                });
-
-                            }
-                        });
-                    },
-                    error: function (jqXHR) {
-                        notification('error', jqXHR.responseJSON.exception.Message);
-                    }
-                });
-            });
-        },
-        error: function (jqXHR) {
-            notification('error', jqXHR.responseJSON.exception.Message);
-        }
-    });
 }
 
 function notification(type, message) {
