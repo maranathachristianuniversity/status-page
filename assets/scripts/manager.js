@@ -274,7 +274,8 @@ $(function () {
                         isresolved: 1
                     },
                     success: function (data) {
-                        notification('success', "Issue resolved.");
+                        notification('success', "Selected Issue marked as resolved.");
+                        init();
                     },
                     error: function (jqXHR) {
                         notification('error', jqXHR.responseJSON.exception.Message);
