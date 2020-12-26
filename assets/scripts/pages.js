@@ -131,15 +131,7 @@ $(function () {
     });
 });
 
-function loadLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-        if (localStorage.getItem("bearer") === null) {
-            window.location = "login";
-        }
-    } else {
-        alert("Sorry! No 'Browser Storage' support..");
-    }
-}
+function loadLocalStorage() {}
 
 function notification(type, message) {
     toastr.options = {
