@@ -20,7 +20,8 @@ $(document).ready(function () {
         e.preventDefault();
         let login = {
             username: $('#uname').val(),
-            password: $('#psw').val()
+            password: $('#psw').val(),
+            version: '1.3.0',
         };
         $.ajax({
             url: $('base#gateway').attr('href') + 'login',

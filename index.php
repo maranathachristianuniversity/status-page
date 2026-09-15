@@ -1,22 +1,19 @@
 <?php
 /*
  *---------------------------------------------------------------
- * SAT FRAMEWORK
+ * PUKO FRAMEWORK
  *---------------------------------------------------------------
  *
  */
 
-use satframework\Framework;
+date_default_timezone_set("Asia/Jakarta");
+
 use satframework\config\Factory;
+use satframework\Framework;
+use Dotenv\Dotenv;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-/*
- *---------------------------------------------------------------
- * APP BASE URL
- *---------------------------------------------------------------
- *
- */
 $protocol = 'http';
 if (isset($_SERVER['HTTPS'])) {
     $protocol = 'https';
@@ -33,16 +30,33 @@ if (isset($_SERVER['HTTPS'])) {
     }
 }
 
+//spin up environment variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
+define('BASE_URL', ($protocol . "://" . $_SERVER['HTTP_HOST'] . "/"));
+
+/*
+ *---------------------------------------------------------------
+ * APP ROOT
+ *---------------------------------------------------------------
+ *
+ */
+define('ROOT', __DIR__);
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: OPTIONS, GET, POST");
+header("Access-Control-Allow-Headers: Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control, Authorization, X-Permissions, X-Agen");
+
 $factory = array(
     'cli_param' => null,
-    'environment' => 'DEV',
+    'environment' => $_SERVER['ENVIRONMENT'],
     'base' => ($protocol . "://" . $_SERVER['HTTP_HOST'] . "/"),
     'root' => __DIR__,
     'start' => microtime(true)
 );
-
 $fo = new Factory($factory);
-
 //Initialize framework object
 $framework = new Framework($fo);
 //Start framework

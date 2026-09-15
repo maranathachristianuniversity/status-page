@@ -4,10 +4,11 @@
   "license": "MIT",
   "version": "1.1.6",
   "require": {
-    "maranathachristianuniversity/sat-framework": "dev-master"
+    "maranathachristianuniversity/sat-framework": "1.1.0",
+    "vlucas/phpdotenv": "^5.4.1"
   },
   "require-dev": {
-    "maranathachristianuniversity/sat-console": "dev-master"
+    "maranathachristianuniversity/sat-console": "1.0.2"
   },
   "minimum-stability": "dev",
   "autoload": {
