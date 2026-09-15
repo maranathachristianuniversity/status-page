@@ -6,7 +6,7 @@ use plugins\controller\StatusPageView;
 
 /**
  * #Master master.html
- * #Value title SAT - Status Page
+ * #Value title Maranatha One - Status Page
  */
 class status extends StatusPageView
 {

@@ -1,6 +1,81 @@
-{!css(<!-- place your custom CSS file here -->)}
+{!css(<link href="assets/vendor/select2/css/select2.min.css" rel="stylesheet">)}
+{!css(<link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">)}
+{!css(<link href="assets/vendor/select2/css/select2-bootstrap.min.css" rel="stylesheet">)}
+{!css(<link href="assets/vendor/toastr/toastr.min.css" rel="stylesheet">)}
+{!css(<link href="assets/vendor/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet">)}
 
-<p>Blank pages is proof that your routes looks right.</p>
-<p>So... Happy designing :)</p>
+<!-- Hero / overall status -->
+<section class="sp-hero" id="spHero">
+    <div class="sp-hero-top">
+        <div>
+            <span class="sp-hero-eyebrow"><i class="fa fa-bolt"></i> Live service status</span>
+            <h1 id="spOverallTitle">Checking services…</h1>
+            <p class="sp-hero-sub" id="spOverallDesc">We are polling all monitored microservices for real-time health. This page refreshes automatically via the status API.</p>
+        </div>
+        <span class="sp-hero-pill" id="spOverallPill"><span class="sp-hero-dot"></span><span id="spOverallPillText">Loading</span></span>
+    </div>
+</section>
 
-{!js(<!-- place your custom JavaScript file here -->)}
+<!-- Stats -->
+<section class="sp-stats">
+    <div class="sp-stat">
+        <div class="sp-stat-icon blue"><i class="fa fa-server"></i></div>
+        <div><b class="total-service">–</b><span>Services monitored</span></div>
+    </div>
+    <div class="sp-stat">
+        <div class="sp-stat-icon amber"><i class="fa fa-exclamation-triangle"></i></div>
+        <div><b class="total-issue">–</b><span>Active issues</span></div>
+    </div>
+    <div class="sp-stat">
+        <div class="sp-stat-icon slate"><i class="fa fa-history"></i></div>
+        <div><b class="total-incidents">–</b><span>Past incidents</span></div>
+    </div>
+</section>
+
+<div class="sp-alert sp-alert-warning" id="spIssueAlert">
+    <i class="fa fa-info-circle"></i>
+    <div><strong><span class="total-issue">-</span> issue(s)</strong> found across <strong><span class="total-service">-</span> services</strong>. Expand a service below to see details and uptime.</div>
+</div>
+
+<div class="sp-grid">
+    <div>
+        <div class="sp-section-head">
+            <h3><i class="fa fa-cubes"></i> Services</h3>
+            <small>Click a service to expand</small>
+        </div>
+        <div class="app-panel-group div-microservices" id="accordion">
+            <div class="sp-card sp-card-pad" style="color:var(--sp-muted)"><i class="fa fa-spinner fa-spin"></i> Loading services…</div>
+        </div>
+
+        <div style="margin-top:26px;">
+            <div class="sp-section-head">
+                <h3><i class="fa fa-clock-o"></i> Past incidents</h3>
+                <small>Resolved history</small>
+            </div>
+            <div class="div-incidents">
+                <div class="sp-card sp-card-pad" style="color:var(--sp-muted)">Loading history…</div>
+            </div>
+        </div>
+    </div>
+    <aside>
+        <div class="sp-card sp-side-card">
+            <div class="sp-side-title"><i class="fa fa-exclamation-circle"></i> Latest issues</div>
+            <div class="sp-side-sub">Ongoing, unresolved incidents</div>
+            <div class="div-latest">
+                <div class="sp-empty"><i class="fa fa-check-circle"></i>Loading…</div>
+            </div>
+        </div>
+        <div class="sp-card sp-card-pad" style="margin-top:14px;">
+            <div style="font-weight:800;font-size:13.5px;margin-bottom:6px;"><i class="fa fa-bell-o" style="color:var(--sp-primary)"></i> Stay informed</div>
+            <div style="font-size:13px;color:var(--sp-muted)">This status page is powered by Maranatha One health checks. Contact DSTI for escalation.</div>
+        </div>
+    </aside>
+</div>
+
+{!js(<script src="assets/vendor/bootbox/bootbox.min.js"></script>)}
+{!js(<script src="assets/vendor/select2/js/select2.full.min.js"></script>)}
+{!js(<script src="assets/vendor/toastr/toastr.min.js"></script>)}
+{!js(<script src="assets/vendor/moment/moment.js"></script>)}
+{!js(<script src="assets/vendor/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>)}
+
+{!js(<script src="assets/scripts/pages.js"></script>)}

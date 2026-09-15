@@ -1,6 +1,31 @@
-{!css(<!-- place your custom CSS file here -->)}
+{!css(<link href="assets/css/login.css" rel="stylesheet">)}
 
-<p>Blank pages is proof that your routes looks right.</p>
-<p>So... Happy designing :)</p>
+<div class="sp-login-wrap">
+    <div class="sp-login-card text-center div-login">
+        <div class="sp-login-hero">
+            <span class="sp-login-badge"><i class="fa fa-shield"></i> Admin access</span>
+            <h4>Administrator Status Page</h4>
+            <p>Sign in to manage services &amp; incidents</p>
+        </div>
+        <div class="sp-login-body text-left">
+            <div class="sp-field">
+                <label for="uname">Username</label>
+                <div class="input-icon">
+                    <i class="fa fa-user"></i>
+                    <input id="uname" type="text" placeholder="Enter username" name="uname" required class="form-control"/>
+                </div>
+            </div>
+            <div class="sp-field">
+                <label for="psw">Password</label>
+                <div class="input-icon">
+                    <i class="fa fa-lock"></i>
+                    <input id="psw" type="password" placeholder="Enter password" name="psw" required class="form-control"/>
+                </div>
+            </div>
+            <button id="btn-login" class="btn btn-primary" type="submit"><i class="fa fa-sign-in"></i> LOGIN</button>
+            <div class="sp-login-foot">Protected area · <a href="{!url()}">← Back to status page</a></div>
+        </div>
+    </div>
+</div>
 
-{!js(<!-- place your custom JavaScript file here -->)}
+{!js(<script src="assets/scripts/login.js"></script>)}

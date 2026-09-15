@@ -5,7 +5,12 @@
     <base id="api" href="{!api()}">
     <base id="gateway" href="{!gateway()}">
     <meta charset="UTF-8">
-    <title>{!title} | Admin Page Status</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0067AC">
+    <title>{!title} | Maranatha Status Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{!url()}assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="{!url()}assets/css/style.css">
     <link rel="stylesheet" href="{!url()}assets/vendor/select2/css/select2.min.css">
@@ -13,30 +18,48 @@
     <link rel="stylesheet" href="{!url()}assets/vendor/toastr/toastr.min.css">
     <link rel="stylesheet" href="{!url()}assets/vendor/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" href="{!url()}assets/img/logo-blue.png">
     {!part(css)}
 </head>
 <body onload="loadLocalStorage()">
-<div id="wrapper">
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a href="#" class="navbar-left">
-                    <img alt="logo-blue.png" class="img-responsive logo resize brand" src="{!url()}assets/img/logo-blue.png">
-                </a>
+<div id="wrapper" class="sp-wrapper">
+    <nav class="sp-navbar sp-navbar-admin">
+        <div class="container sp-navbar-inner">
+            <a href="{!url()}manager" class="sp-brand">
+                <span class="sp-brand-logo">
+                    <img alt="Maranatha" src="{!url()}assets/img/logo-blue.png">
+                </span>
+                <span class="sp-brand-text">
+                    <strong>Maranatha Status</strong>
+                    <small>Admin Console <span class="sp-admin-tag">ADMIN</span></small>
+                </span>
+            </a>
+            <div class="sp-nav-right">
+                <a class="sp-nav-link" href="{!url()}"><i class="fa fa-eye"></i><span class="hidden-xs"> View public page</span></a>
+                <a class="sp-nav-link" href="https://apps.maranatha.edu/"><i class="fa fa-home"></i></a>
+                <a class="sp-btn sp-btn-ghost sp-btn-sm" href="#" id="btn-logout"><i class="fa fa-sign-out"></i> Logout</a>
             </div>
-            <ul class="nav navbar-nav pull-right">
-                <li><a href="#" id="btn-logout"><i class="fa fa-sign-out"></i> Logout</a></li>
-                <li><a href="https://apps.maranatha.edu/"><i class="fa fa-home"></i></a></li>
-            </ul>
         </div>
     </nav>
-    <div class="container">
-        {CONTENT}
-    </div>
-    <footer class="col-md-12">
-        <hr>
-        <div class="text-center">&copy 2020 Direktorat Sistem Teknologi Informasi - Universitas Kristen Maranatha</div>
-        <br>
+    <main class="sp-main">
+        <div class="container sp-container">
+            {CONTENT}
+        </div>
+    </main>
+    <footer class="sp-footer">
+        <div class="container sp-footer-inner">
+            <div class="sp-footer-brand">
+                <img alt="Maranatha" src="{!url()}assets/img/logo-blue.png">
+                <div>
+                    <strong>Direktorat Sistem Teknologi Informasi</strong>
+                    <span>Universitas Kristen Maranatha</span>
+                </div>
+            </div>
+            <div class="sp-footer-meta">
+                <span><i class="fa fa-circle sp-footer-dot"></i> Admin Console · Maranatha One</span>
+                <span>&copy; 2020–2026 Status Page</span>
+            </div>
+        </div>
     </footer>
     <script type="text/javascript" src="{!url()}assets/js/jquery.min.js"></script>
     <script type="text/javascript" src="{!url()}assets/js/bootstrap.min.js"></script>

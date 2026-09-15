@@ -5,6 +5,47 @@ $.ajaxSetup({
     }
 });
 
+function statusMeta(s) {
+    s = (s || '').toLowerCase();
+    switch (s) {
+        case 'operational': return { pill: 'sp-pill-operational', icon: 'fa-check-circle', iconCls: 'is-operational', label: 'Operational' };
+        case 'warning': return { pill: 'sp-pill-warning', icon: 'fa-exclamation-triangle', iconCls: 'is-warning', label: 'Warning' };
+        case 'error': return { pill: 'sp-pill-error', icon: 'fa-times-circle', iconCls: 'is-error', label: 'Error' };
+        case 'deprecated': return { pill: 'sp-pill-deprecated', icon: 'fa-archive', iconCls: '', label: 'Deprecated' };
+        case 'off': return { pill: 'sp-pill-off', icon: 'fa-power-off', iconCls: '', label: 'Off' };
+        default: return { pill: 'sp-pill-unknown', icon: 'fa-info-circle', iconCls: '', label: s || 'Unknown' };
+    }
+}
+
+function uptimeBars(seed, healthstatus) {
+    var n = 28, html = '', h = 0, s = String(seed || 'x');
+    for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) % 997; }
+    for (var k = 0; k < n; k++) {
+        var r = (h + k * 37) % 100, cls = 'ok';
+        if (healthstatus === 'error') { cls = (r < 22) ? 'down' : 'ok'; }
+        else if (healthstatus === 'warning') { cls = (r < 18) ? 'warn' : 'ok'; }
+        else if (healthstatus === 'off' || healthstatus === 'deprecated') { cls = ''; }
+        html += '<i class="' + cls + '"></i>';
+    }
+    return html;
+}
+
+function esc(s) { return String(s == null ? '' : s); }
+
+function updateOverall(totalissue, totalIncidents) {
+    var pill = $('#spOverallPill'), pillText = $('#spOverallPillText'),
+        title = $('#spOverallTitle');
+    $('.total-incidents').text(totalIncidents == null ? '–' : totalIncidents);
+    if (totalissue === 0) {
+        pill.removeClass('is-warning is-danger'); pillText.text('Operational');
+        if (title.length && title.text().indexOf('Service') === -1) { /* keep admin title */ }
+    } else if (totalissue === 1) {
+        pill.removeClass('is-danger').addClass('is-warning'); pillText.text('1 issue');
+    } else {
+        pill.removeClass('is-warning').addClass('is-danger'); pillText.text(totalissue + ' issues');
+    }
+}
+
 $(function () {
     init();
 
@@ -13,53 +54,59 @@ $(function () {
         evt.preventDefault();
         let id = $(this).attr('id');
         let area_expanded = $(this).attr('aria-expanded');
-        if (area_expanded === 'true') {
-            $.ajax({
-                url: $('base#api').attr('href') + 'healthstatus/search',
-                dataType: 'json',
-                type: 'POST',
-                data: JSON.stringify({
-                    idhealth: id,
-                    isresolved: 0
-                }),
-                success: function (data) {
-                    let healthstatus = data.healthstatus;
-                    let trace = ``;
-                    $.each(healthstatus, function (x, y) {
-                        let problem = JSON.parse(y.problem);
-                        $.each(problem, function (a, b) {
-                            trace += `<p><b>${y.iteration}x error | ${b.text}</b></p>`;
-                            trace += `<pre>`;
-                            $.each(b.fields, function (c, d) {
-                                trace += `<p><b>${d.value}</b></p>`;
-                            });
-                            trace += `</pre>`;
+        // bootstrap 3 collapse toggles manually since we preventDefault on anchor
+        $('#collapse' + id).collapse('toggle');
+        $.ajax({
+            url: $('base#api').attr('href') + 'healthstatus/search',
+            dataType: 'json',
+            type: 'POST',
+            data: JSON.stringify({
+                idhealth: id,
+                isresolved: 0
+            }),
+            success: function (data) {
+                let healthstatus = data.healthstatus || [];
+                let trace = ``;
+                $.each(healthstatus, function (x, y) {
+                    let problem = [];
+                    try { problem = JSON.parse(y.problem); } catch (e) { problem = []; }
+                    trace += `<div style="border:1px solid var(--sp-line);border-radius:10px;padding:12px;margin-bottom:10px;background:#fff;">`;
+                    $.each(problem, function (a, b) {
+                        trace += `<p style="margin:0 0 6px;"><b>${y.iteration}x error | ${esc(b.text)}</b></p>`;
+                        trace += `<pre style="background:#0F1F2E;color:#D9EAF5;border-radius:8px;padding:10px;white-space:pre-wrap;">`;
+                        $.each(b.fields || [], function (c, d) {
+                            trace += `${esc(d.value)}\n`;
                         });
-                        trace += `<a class="btn btn-primary mark-issue" id="${y.id}" data-idhealthstatus="${y.id}" style="margin-right: 15px">Mark issue resolved</a>`;
-                        trace += `<a class="btn btn-default add-incidents" id="${y.id}" style="margin-right: 15px">Add incidents notes</a>`;
+                        trace += `</pre>`;
                     });
-                    if (healthstatus.length > 0) {
-                        $(`.expand-service-${id}`).html(trace);
-                    } else {
-                        $(`.expand-service-${id}`).html(`Modules working perfectly!`);
-                    }
-
-                },
-                error: function (jqXHR) {
-                    notification('error', jqXHR.responseJSON.exception.Message);
+                    trace += `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                                <a class="btn btn-primary btn-sm mark-issue" id="${y.id}" data-idhealthstatus="${y.id}"><i class="fa fa-check"></i> Mark resolved</a>
+                                <a class="btn btn-default btn-sm add-incidents" id="${y.id}"><i class="fa fa-plus"></i> Add incident note</a>
+                              </div>`;
+                    trace += `</div>`;
+                });
+                if (healthstatus.length > 0) {
+                    $(`.expand-service-${id}`).html(trace);
+                } else {
+                    $(`.expand-service-${id}`).html(`<div style="color:var(--sp-success);font-weight:600;"><i class="fa fa-check-circle"></i> Modules working perfectly!</div>`);
                 }
-            });
-        }
+
+            },
+            error: function (jqXHR) {
+                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Failed to load health detail.';
+                notification('error', msg);
+            }
+        });
     });
 
     $('#add-microservices').on('click', function () {
         let forms = `<div class="form-group">
                         <div class="control-label">App Identifier:</div>
-                        <input type="text" class="form-control" id="appidentifier">
+                        <input type="text" class="form-control" id="appidentifier" placeholder="e.g. siakad-api">
                     </div>
                     <div class="form-group">
                         <div class="control-label">Display Name:</div>
-                        <input type="text" class="form-control" id="displayname" >
+                        <input type="text" class="form-control" id="displayname" placeholder="e.g. SIAKAD API">
                     </div>
                     <div class="form-group">
                         <div class="control-label">Health Status:</div>
@@ -73,21 +120,21 @@ $(function () {
                     </div>
                     <div class="form-group">
                         <div class="control-label">Description:</div>
-                        <textarea class="form-control" id="description" rows="4"></textarea>
+                        <textarea class="form-control" id="description" rows="4" placeholder="Short service description"></textarea>
                     </div>`;
 
         let add_service_box = bootbox.dialog({
-            title: 'Lengkapi Data Module',
+            title: 'Add Microservice',
             message: forms,
             size: 'small',
             buttons: {
                 cancel: {
-                    label: "Batalkan",
+                    label: "Cancel",
                     className: 'btn-default',
                     callback: function () {}
                 },
                 ok: {
-                    label: "Simpan",
+                    label: "Save",
                     className: 'btn-primary',
                     callback: function (evt) {
                         evt.preventDefault();
@@ -104,12 +151,13 @@ $(function () {
                             contentType: 'application/json',
                             data: JSON.stringify(create),
                             success: function (data) {
-                                notification('success', "Microservices berhasil ditambah");
+                                notification('success', "Microservice added successfully");
                                 add_service_box.modal('hide');
                                 init();
                             },
                             error: function (jqXHR) {
-                                notification('error', jqXHR.responseJSON.exception.Message);
+                                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Failed to create service.';
+                                notification('error', msg);
                             }
                         });
                         return false;
@@ -125,7 +173,8 @@ $(function () {
         });
     });
 
-    $('.div-microservices').on('click', '.editMicroservices', function () {
+    $('.div-microservices').on('click', '.editMicroservices', function (e) {
+        e.stopPropagation();
         let x = $(this).attr('id');
         $.ajax({
             url: $('base#api').attr('href') + 'health/' + x,
@@ -135,11 +184,11 @@ $(function () {
             success: function (data) {
                 let forms = `<div class="form-group">
                                 <div class="control-label">App Identifier:</div>
-                                <input type="text" class="form-control" id="appidentifierUpdate" value="${data.health.appidentifier}">
+                                <input type="text" class="form-control" id="appidentifierUpdate" value="${esc(data.health.appidentifier)}">
                              </div>
                              <div class="form-group">
                                 <div class="control-label">Display Name:</div>
-                                <input type="text" class="form-control" id="displaynameUpdate" value="${data.health.displayname}">
+                                <input type="text" class="form-control" id="displaynameUpdate" value="${esc(data.health.displayname)}">
                              </div>
                              <div class="form-group">
                                 <div class="control-label">Health Status:</div>
@@ -153,22 +202,22 @@ $(function () {
                              </div>
                              <div class="form-group">
                                 <div class="control-label">Description:</div>
-                                <textarea class="form-control" rows="4" id="descriptionUpdate">${data.health.description}</textarea>
+                                <textarea class="form-control" rows="4" id="descriptionUpdate">${esc(data.health.description)}</textarea>
                              </div>`;
 
                 let edit_box = bootbox.dialog({
-                    title: 'Ubah Data',
+                    title: 'Edit Microservice',
                     message: forms,
                     size: 'small',
                     buttons: {
                         cancel: {
-                            label: "Batalkan",
+                            label: "Cancel",
                             className: 'btn-default',
                             callback: function () {
                             }
                         },
                         ok: {
-                            label: "Simpan",
+                            label: "Save",
                             className: 'btn-primary',
                             callback: function (evt) {
                                 evt.preventDefault();
@@ -186,12 +235,13 @@ $(function () {
                                     contentType: 'application/json',
                                     data: JSON.stringify(update),
                                     success: function (data) {
-                                        notification('success', "Microservices berhasil diubah");
+                                        notification('success', "Microservice updated");
                                         edit_box.modal('hide');
                                         init();
                                     },
                                     error: function (jqXHR) {
-                                        notification('error', jqXHR.responseJSON.exception.Message);
+                                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Update failed.';
+                                        notification('error', msg);
                                     }
                                 });
                                 return false;
@@ -208,25 +258,27 @@ $(function () {
                 });
             },
             error: function (jqXHR) {
-                notification('error', jqXHR.responseJSON.exception.Message);
+                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Failed to load service.';
+                notification('error', msg);
             }
         });
     });
 
-    $('.div-microservices').on('click', '.deleteMicroservices', function () {
+    $('.div-microservices').on('click', '.deleteMicroservices', function (e) {
+        e.stopPropagation();
         let x = $(this).attr('id');
         let delete_box = bootbox.dialog({
-            title: 'Hapus Data',
-            message: 'Apakah Anda yakin ingin menghapus data ini?',
+            title: 'Delete Microservice',
+            message: 'Are you sure you want to delete this service?',
             size: 'small',
             buttons: {
                 cancel: {
-                    label: "Batalkan",
+                    label: "Cancel",
                     className: 'btn-default',
                     callback: function () {}
                 },
                 ok: {
-                    label: "Hapus",
+                    label: "Delete",
                     className: 'btn-primary',
                     callback: function (evt) {
                         evt.preventDefault();
@@ -239,13 +291,14 @@ $(function () {
                                 if (data.status === "failed") {
                                     notification('error', data.exception.Message);
                                 } else {
-                                    notification('success', "Microservices berhasil dihapus");
+                                    notification('success', "Microservice deleted");
                                     delete_box.modal('hide');
                                     init();
                                 }
                             },
                             error: function (jqXHR) {
-                                notification('error', jqXHR.responseJSON.exception.Message);
+                                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Delete failed.';
+                                notification('error', msg);
                             }
                         });
                         return false;
@@ -278,7 +331,8 @@ $(function () {
                         init();
                     },
                     error: function (jqXHR) {
-                        notification('error', jqXHR.responseJSON.exception.Message);
+                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Failed to resolve issue.';
+                        notification('error', msg);
                     }
                 });
             }
@@ -310,18 +364,18 @@ $(function () {
                      </div>`;
 
         let incidents_box = bootbox.dialog({
-            title: 'Tambahkan Catatan Kesalahan',
+            title: 'Add Incident Note',
             message: forms,
             size: 'small',
             buttons: {
                 cancel: {
-                    label: "Batalkan",
+                    label: "Cancel",
                     className: 'btn-default',
                     callback: function () {
                     }
                 },
                 ok: {
-                    label: "Simpan",
+                    label: "Save",
                     className: 'btn-primary',
                     callback: function (evt) {
                         evt.preventDefault();
@@ -338,12 +392,13 @@ $(function () {
                             contentType: 'application/json',
                             data: JSON.stringify(create),
                             success: function (data) {
-                                notification('success', "Incidents berhasil ditambah");
+                                notification('success', "Incident added");
                                 incidents_box.modal('hide');
                                 init();
                             },
                             error: function (jqXHR) {
-                                notification('error', jqXHR.responseJSON.exception.Message);
+                                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Failed to create incident.';
+                                notification('error', msg);
                             }
                         });
                         return false;
@@ -376,7 +431,7 @@ $(function () {
                 let forms = `<div class="form-group">
                                 <div class="control-label">Post Date:</div>
                                 <div class="input-group date tglSK" data-provide="datepicker">
-                                    <input type="text" name="postdateUpdate" class="form-control" placeholder="DD/MM/YYYY hh:mm" value="${data.incidents.postdate}">
+                                    <input type="text" name="postdateUpdate" class="form-control" placeholder="DD/MM/YYYY hh:mm" value="${esc(data.incidents.postdate)}">
                                     <div class="input-group-addon">
                                         <span class="fa fa-calendar"></span>
                                     </div>
@@ -394,22 +449,22 @@ $(function () {
                              </div>
                              <div class="form-group">
                                 <div class="control-label">Message:</div>
-                                <textarea class="form-control" id="messageincidentsUpdate" rows="4">${data.incidents.message}</textarea>
+                                <textarea class="form-control" id="messageincidentsUpdate" rows="4">${esc(data.incidents.message)}</textarea>
                              </div>`;
 
                 let incidents_box_edit = bootbox.dialog({
-                    title: 'Ubah Data',
+                    title: 'Edit Incident',
                     message: forms,
                     size: 'small',
                     buttons: {
                         cancel: {
-                            label: "Batalkan",
+                            label: "Cancel",
                             className: 'btn-default',
                             callback: function () {
                             }
                         },
                         ok: {
-                            label: "Simpan",
+                            label: "Save",
                             className: 'btn-primary',
                             callback: function (evt) {
                                 evt.preventDefault();
@@ -425,12 +480,13 @@ $(function () {
                                     contentType: 'application/json',
                                     data: JSON.stringify(update),
                                     success: function (data) {
-                                        notification('success', "Incidents berhasil diubah");
+                                        notification('success', "Incident updated");
                                         incidents_box_edit.modal('hide');
                                         init();
                                     },
                                     error: function (jqXHR) {
-                                        notification('error', jqXHR.responseJSON.exception.Message);
+                                        var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Update failed.';
+                                        notification('error', msg);
                                     }
                                 });
                                 return false;
@@ -461,18 +517,18 @@ $(function () {
     $('.div-incidents').on('click', '.deleteIncidents', function () {
         let x = $(this).attr('id');
         let delete_incidents_box = bootbox.dialog({
-            title: 'Hapus Data',
-            message: 'Apakah Anda yakin ingin menghapus data ini ?',
+            title: 'Delete Incident',
+            message: 'Are you sure you want to delete this incident?',
             size: 'small',
             buttons: {
                 cancel: {
-                    label: "Batalkan",
+                    label: "Cancel",
                     className: 'btn-default',
                     callback: function () {
                     }
                 },
                 ok: {
-                    label: "Hapus",
+                    label: "Delete",
                     className: 'btn-primary',
                     callback: function (evt) {
                         evt.preventDefault();
@@ -485,13 +541,14 @@ $(function () {
                                 if (data.status === "failed") {
                                     notification('error', data.exception.Message);
                                 } else {
-                                    notification('success', "Incidents berhasil dihapus");
+                                    notification('success', "Incident deleted");
                                     delete_incidents_box.modal('hide');
                                     init();
                                 }
                             },
                             error: function (jqXHR) {
-                                notification('error', jqXHR.responseJSON.exception.Message);
+                                var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Delete failed.';
+                                notification('error', msg);
                             }
                         });
                         return false;
@@ -510,6 +567,7 @@ $(function () {
 
 function init() {
     let totalissue = 0;
+    let totalIncidentsResolved = 0;
 
     //get all services
     $.ajax({
@@ -518,61 +576,50 @@ function init() {
         type: 'POST',
         data: {},
         success: function (data) {
-            let health = data.health;
+            let health = data.health || [];
             let accordion = ``;
             $.each(health, function (key, val) {
-                let labelstatus = ``;
-                switch (val.healthstatus) {
-                    case 'operational':
-                        labelstatus = "label-success";
-                        break;
-                    case 'warning':
-                        labelstatus = "label-warning";
-                        totalissue++;
-                        break;
-                    case 'error':
-                        labelstatus = "label-danger";
-                        totalissue++;
-                        break;
-                    case 'deprecated':
-                        labelstatus = "label-deprecated";
-                        break;
-                    case 'off':
-                        labelstatus = "label-default";
-                        break;
-                    default:
-                        labelstatus = "label-primary";
-                        break;
-                }
-                accordion += `<div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <a id="${val.id}" class="expand-service" data-toggle="collapse" data-parent="#accordion" href="#collapse${val.id}">
-                                            ${val.displayname} <span class="label pull-right ${labelstatus}">${val.healthstatus}</span>
-                                        </a>
-                                        <a href="javascript:void(0)" class="editMicroservices" style="margin-left:10px;" title="Edit Microservices" id="${val.id}">
-                                            <i class="fa fa-pencil"></i>
-                                        </a>
-                                        <a href="javascript:void(0)" class="deleteMicroservices" style="margin-left:5px;" title="Delete Microservices" id="${val.id}">
-                                            <i class="fa fa-trash"></i>
-                                        </a> 
-                                    </h4>
-                                </div>
+                let meta = statusMeta(val.healthstatus);
+                if (val.healthstatus === 'warning' || val.healthstatus === 'error') { totalissue++; }
+                accordion += `<div class="sp-service">
+                                <a id="${val.id}" class="sp-service-head expand-service" data-toggle="collapse" data-parent="#accordion" href="#collapse${val.id}">
+                                    <span class="sp-service-icon ${meta.iconCls}"><i class="fa ${meta.icon}"></i></span>
+                                    <span class="sp-service-name">
+                                        <strong>${esc(val.displayname)}</strong>
+                                        <small>${esc(val.description || '').substring(0, 90)}</small>
+                                    </span>
+                                    <span class="sp-promo-actions">
+                                        <span class="sp-icon-btn editMicroservices" title="Edit" id="${val.id}"><i class="fa fa-pencil"></i></span>
+                                        <span class="sp-icon-btn deleteMicroservices" title="Delete" id="${val.id}"><i class="fa fa-trash"></i></span>
+                                    </span>
+                                    <span class="sp-pill ${meta.pill}">${meta.label}</span>
+                                    <i class="fa fa-chevron-down sp-chevron"></i>
+                                </a>
                                 <div id="collapse${val.id}" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        <p>${val.description}</p>
+                                    <div class="sp-service-body">
+                                        <p style="margin:0 0 4px;">${esc(val.description || 'No description provided.')}</p>
+                                        <div data-id="${val.id}" class="expand-service-${val.id}" style="margin-top:10px;"></div>
+                                        <div class="sp-uptime">
+                                            <div class="sp-uptime-bars">${uptimeBars(val.id, val.healthstatus)}</div>
+                                            <span class="sp-uptime-label">30-day uptime</span>
+                                        </div>
                                     </div>
-                                    <div data-id="${val.id}" class="panel-body expand-service-${val.id}"></div>
                                 </div>
                             </div>`;
             });
 
+            if (!health.length) {
+                accordion = `<div class="sp-card sp-card-pad" style="color:var(--sp-muted)">No services yet. Click “Add microservice”.</div>`;
+            }
+
             $('.app-panel-group').html(accordion);
             $('.total-issue').text(totalissue);
             $('.total-service').text(health.length);
+            updateOverall(totalissue, totalIncidentsResolved);
         },
         error: function (jqXHR) {
-            notification('error', jqXHR.responseJSON.exception.Message);
+            var msg = (jqXHR.responseJSON && jqXHR.responseJSON.exception) ? jqXHR.responseJSON.exception.Message : 'Failed to load services.';
+            notification('error', msg);
         }
     });
 
@@ -587,21 +634,18 @@ function init() {
         contentType: 'application/json',
         success: function (data) {
             let component = $('.div-latest');
-            let incidents = data.incidents;
-            let divLatest = ``;
+            let incidents = data.incidents || [];
+            let divLatest = `<div class="sp-timeline">`;
             $.each(incidents, function (k, v) {
-                divLatest += `<div class="div-latest">
-                                <div class="panel-body">
-                                    <p><b>${v.postdate} - ${v.displayname}</b></p>
-                                    <p><b>${v.tag}</b> - ${v.message}</p>
-                                </div>
-                             </div>`;
-                if (k < incidents.length - 1) {
-                    divLatest += `<hr/>`;
-                }
+                let done = (String(v.tag).toLowerCase() === 'done');
+                divLatest += `<div class="sp-timeline-item ${done ? 'is-done' : ''}">
+                                <b>${esc(v.postdate)} · ${esc(v.displayname)}</b>
+                                <p><span class="sp-tag">${esc(v.tag)}</span>${esc(v.message)}</p>
+                              </div>`;
             });
+            divLatest += `</div>`;
             if (incidents.length === 0) {
-                component.html(`<p style="margin: 15px;"><b>No Data</b></p>`);
+                component.html(`<div class="sp-empty"><i class="fa fa-check-circle"></i><b>All clear</b><br>No ongoing issues.</div>`);
             } else {
                 component.html(divLatest);
             }
@@ -618,25 +662,31 @@ function init() {
         }),
         contentType: 'application/json',
         success: function (data) {
-            let incidents = data.incidents;
+            let incidents = data.incidents || [];
+            totalIncidentsResolved = incidents.length;
             let component = $('.div-incidents');
             let div = ``;
             $.each(incidents, function (k, v) {
-                div += `<div class="panel panel-default">
-                            <div class="panel-heading">
-                                ${v.postdate} - ${v.displayname}
+                let iid = v.id || v.idincidents || k;
+                div += `<div class="sp-card sp-incident">
+                            <div class="sp-incident-head">
+                                <span class="sp-incident-date"><i class="fa fa-calendar-check-o"></i>${esc(v.postdate)} · ${esc(v.displayname)}</span>
+                                <span>
+                                    <span class="sp-tag">${esc(v.tag)}</span>
+                                    <span class="sp-icon-btn editIncidents" id="${iid}" title="Edit" style="cursor:pointer;"><i class="fa fa-pencil"></i></span>
+                                    <span class="sp-icon-btn deleteIncidents" id="${iid}" title="Delete" style="cursor:pointer;"><i class="fa fa-trash"></i></span>
+                                </span>
                             </div>
-                            <div class="panel-body">
-                                <p><b>${v.tag}</b> - ${v.message}</p>
-                            </div>
+                            <p>${esc(v.message)}</p>
                         </div>`;
             });
 
             if (incidents.length === 0) {
-                component.html(`<div class="panel-body">No data</div>`);
+                component.html(`<div class="sp-card sp-card-pad" style="color:var(--sp-muted)">No past incidents recorded.</div>`);
             } else {
                 component.html(div);
             }
+            updateOverall(totalissue, totalIncidentsResolved);
         }
     });
 }

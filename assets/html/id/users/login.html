@@ -1,12 +1,31 @@
 {!css(<link href="assets/css/login.css" rel="stylesheet">)}
 
-<div class="text-center div-login">
-    <h4>Administrator Page Status</h4>
-    <br/>
-    <input id="uname" type="text" placeholder="Username" name="uname" required class="form-control"/>
-    <input id="psw" type="password" placeholder="Password" name="psw" required class="form-control"/>
-    <br/>
-    <button id="btn-login" class="btn btn-primary" type="submit">LOGIN</button>
+<div class="sp-login-wrap">
+    <div class="sp-login-card text-center div-login">
+        <div class="sp-login-hero">
+            <span class="sp-login-badge"><i class="fa fa-shield"></i> Admin access</span>
+            <h4>Administrator Status Page</h4>
+            <p>Sign in to manage services &amp; incidents</p>
+        </div>
+        <div class="sp-login-body text-left">
+            <div class="sp-field">
+                <label for="uname">Username</label>
+                <div class="input-icon">
+                    <i class="fa fa-user"></i>
+                    <input id="uname" type="text" placeholder="Enter username" name="uname" required class="form-control"/>
+                </div>
+            </div>
+            <div class="sp-field">
+                <label for="psw">Password</label>
+                <div class="input-icon">
+                    <i class="fa fa-lock"></i>
+                    <input id="psw" type="password" placeholder="Enter password" name="psw" required class="form-control"/>
+                </div>
+            </div>
+            <button id="btn-login" class="btn btn-primary" type="submit"><i class="fa fa-sign-in"></i> LOGIN</button>
+            <div class="sp-login-foot">Protected area · <a href="{!url()}">← Back to status page</a></div>
+        </div>
+    </div>
 </div>
 
 {!js(<script src="assets/scripts/login.js"></script>)}
