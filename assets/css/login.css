@@ -43,3 +43,15 @@ input { margin-bottom: 0; }
 
 /* legacy hook */
 .div-login { width: auto; min-height: 0; margin: 0; padding: 0; background: transparent; border: none; border-radius: 0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 520px) {
+  .sp-login-wrap { margin: 20px 14px 8px; max-width: none; }
+  .sp-login-card { border-radius: 16px; }
+  .sp-login-hero { padding: 22px 20px 20px; }
+  .sp-login-hero h4 { font-size: 18px; }
+  .sp-login-hero p { font-size: 13px; }
+  .sp-login-body { padding: 20px 18px 22px; }
+  .sp-field .form-control { height: 46px; font-size: 16px; }
+  #btn-login { height: 48px; }
+}

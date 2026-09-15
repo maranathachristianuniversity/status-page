@@ -29,6 +29,10 @@
 }
 
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+img { max-width: 100%; }
+pre { white-space: pre-wrap; word-break: break-word; max-width: 100%; overflow-x: auto; }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -297,13 +301,108 @@ a:hover, a:focus { color: var(--sp-primary-700); }
 .toast-success { background-color: var(--sp-success) !important; }
 .toast-error { background-color: var(--sp-danger) !important; }
 
-/* responsive */
+/* ---------- Responsive: tablet ---------- */
 @media (max-width: 991px) {
   .sp-grid { grid-template-columns: 1fr; }
   .sp-side-card { position: static; }
-  .sp-stats { grid-template-columns: 1fr; margin-top: 14px; }
-  .sp-hero { padding: 24px 20px 22px; }
-  .sp-hero h1 { font-size: 24px; }
-  .sp-hero-top { flex-direction: column; }
+  .sp-stats { grid-template-columns: repeat(3, 1fr); gap: 10px; margin: -48px 0 16px; }
+  .sp-stat { padding: 13px 14px; gap: 11px; }
+  .sp-stat-icon { width: 38px; height: 38px; font-size: 16px; }
+  .sp-stat b { font-size: 19px; }
+  .sp-hero { padding: 26px 22px 78px; border-radius: 18px; margin-top: 16px; }
+  .sp-hero h1 { font-size: clamp(22px, 3.4vw, 28px); }
+  .sp-hero-top { gap: 14px; }
+  .sp-main { padding-bottom: 32px; }
+}
+
+/* ---------- Responsive: mobile ---------- */
+@media (max-width: 640px) {
+  body { font-size: 14px; }
+
+  /* navbar: compact, no overflow */
+  .sp-navbar-inner { height: auto; min-height: 60px; padding: 10px 15px; gap: 10px; }
+  .sp-brand { gap: 9px; min-width: 0; flex: 1; }
+  .sp-brand-logo { width: 36px; height: 36px; border-radius: 10px; }
+  .sp-brand-logo img { width: 24px; height: 24px; }
+  .sp-brand-text { min-width: 0; }
+  .sp-brand-text strong { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sp-brand-text small { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sp-nav-right { gap: 8px; flex-shrink: 0; }
+  .sp-nav-link { font-size: 16px; padding: 8px 4px; }
+  .sp-live-badge { font-size: 11px; padding: 6px 10px; gap: 6px; max-width: 42vw; overflow: hidden; }
+  .sp-live-badge #navLiveText { overflow: hidden; text-overflow: ellipsis; }
+  .sp-btn-sm { padding: 8px 12px; font-size: 12.5px; }
+
+  /* hero stacks, pill aligns left */
+  .sp-hero { border-radius: 16px; margin-top: 14px; padding: 22px 18px; }
+  .sp-hero-top { flex-direction: column; align-items: stretch; }
+  .sp-hero h1 { font-size: clamp(21px, 6vw, 25px); margin: 8px 0 6px; }
+  .sp-hero p.sp-hero-sub { font-size: 13.5px; }
+  .sp-hero-eyebrow { font-size: 11px; }
+  .sp-hero-pill { align-self: flex-start; font-size: 12px; padding: 8px 14px; }
+
+  /* stats stack full-width */
+  .sp-stats { grid-template-columns: 1fr; margin: 12px 0 14px; gap: 10px; }
+  .sp-stat { padding: 13px 15px; }
+
+  /* service cards: wrap gracefully */
+  .sp-service-head { flex-wrap: wrap; gap: 10px; padding: 13px 14px; row-gap: 8px; }
+  .sp-service-icon { width: 34px; height: 34px; font-size: 14px; }
+  .sp-service-name { flex: 1 1 140px; }
+  .sp-service-name strong { font-size: 14px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .sp-service-name small { display: none; }
+  .sp-pill { font-size: 10px; padding: 5px 9px; letter-spacing: .03em; }
+  .sp-chevron { display: none; }
+  .sp-promo-actions { order: 5; }
+  .sp-icon-btn { width: 36px; height: 36px; font-size: 14px; }
+  .sp-service-body { padding: 12px 14px; font-size: 13px; }
+  .sp-uptime { gap: 6px; }
+  .sp-uptime-bars { gap: 2px; }
+  .sp-uptime-bars i { height: 22px; min-width: 2px; border-radius: 3px; }
+  .sp-uptime-label { font-size: 11px; }
+
+  /* sections */
+  .sp-section-head { margin: 4px 2px 10px; }
+  .sp-section-head h3 { font-size: 14px; }
+  .sp-section-head small { display: none; }
+  .sp-alert { font-size: 13px; padding: 12px 13px; }
+  .sp-card-pad { padding: 15px; }
+
+  /* sidebar + incidents */
+  .sp-timeline { padding: 4px 15px 15px; }
+  .sp-side-title { padding: 13px 15px 0; }
+  .sp-side-sub { padding: 2px 15px 10px; }
+  .sp-incident { padding: 13px 14px; }
+  .sp-incident-head { flex-wrap: wrap; align-items: flex-start; }
+  .sp-incident-date { font-size: 12.5px; flex: 1 1 100%; }
+  .sp-tag { margin-bottom: 4px; }
+
+  /* toolbar: full-width CTA */
+  .sp-toolbar { flex-direction: column; align-items: stretch; }
+  .sp-toolbar h2 { font-size: 17px; }
+  .sp-toolbar .sp-btn { width: 100%; justify-content: center; padding: 12px 16px; }
+
+  /* footer stacks centered */
+  .sp-footer-inner { flex-direction: column; text-align: center; justify-content: center; padding: 16px 15px; gap: 10px; }
+  .sp-footer-brand { flex-direction: column; gap: 8px; }
+  .sp-footer-meta { flex-direction: column; gap: 2px; }
+
+  /* modals fit small screens */
+  .modal-dialog { margin: 12px; width: auto !important; }
+  .modal-body { padding: 15px !important; }
+  .bootbox .modal-dialog { max-width: calc(100vw - 24px); }
+
+  /* toasts don't cover screen */
+  #toast-container { left: 12px; right: 12px; width: auto !important; }
+  #toast-container > div { width: 100% !important; font-size: 13px; }
+}
+
+/* ---------- Responsive: very small phones ---------- */
+@media (max-width: 400px) {
+  .sp-brand-text small { display: none; }
   .sp-live-badge { display: none; }
+  .sp-hero { padding: 20px 15px; }
+  .sp-service-head { padding: 12px; }
+  .sp-uptime-label { display: none; }
+  .sp-stat b { font-size: 18px; }
 }
