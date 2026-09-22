@@ -188,8 +188,11 @@ a:hover, a:focus { color: var(--sp-primary-700); }
   overflow: hidden; transition: all .18s ease;
 }
 .sp-service:hover { border-color: var(--sp-primary-200); box-shadow: var(--sp-shadow); transform: translateY(-1px); }
-.sp-service-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-decoration: none !important; }
-.sp-service-head:hover { background: #FAFCFE; }
+.sp-service-head { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 16px; }
+/* legacy public-page markup uses the anchor itself as the head */
+a.sp-service-head { gap: 12px; padding: 14px 16px; text-decoration: none !important; }
+a.sp-service-head:hover, .sp-service-main:hover { background: #FAFCFE; }
+.sp-service-main { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 6px 2px; text-decoration: none !important; color: inherit; border-radius: 8px; }
 .sp-service-icon {
   width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
@@ -202,10 +205,11 @@ a:hover, a:focus { color: var(--sp-primary-700); }
 .sp-service-name strong { display: block; font-size: 14.5px; font-weight: 700; color: var(--sp-ink); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sp-service-name small { color: var(--sp-muted); font-size: 12.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sp-chevron { color: #9AA9BB; transition: transform .2s; }
-.sp-promo-actions { display: flex; gap: 6px; }
+.sp-promo-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .sp-icon-btn {
   width: 30px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--sp-line); background: #fff; color: var(--sp-muted);
+  cursor: pointer; padding: 0; font-size: 13px; line-height: 1;
 }
 .sp-icon-btn:hover { color: var(--sp-primary); border-color: var(--sp-primary-200); }
 .sp-service-body { border-top: 1px dashed var(--sp-line); background: #FAFCFE; padding: 14px 16px; font-size: 13.5px; color: #334155; }
@@ -346,7 +350,9 @@ a:hover, a:focus { color: var(--sp-primary-700); }
   .sp-stat { padding: 13px 15px; }
 
   /* service cards: wrap gracefully */
-  .sp-service-head { flex-wrap: wrap; gap: 10px; padding: 13px 14px; row-gap: 8px; }
+  .sp-service-head { gap: 8px; padding: 8px 10px 8px 14px; }
+  a.sp-service-head { flex-wrap: wrap; gap: 10px; padding: 13px 14px; row-gap: 8px; }
+  .sp-service-main { flex-wrap: wrap; gap: 10px; row-gap: 8px; }
   .sp-service-icon { width: 34px; height: 34px; font-size: 14px; }
   .sp-service-name { flex: 1 1 140px; }
   .sp-service-name strong { font-size: 14px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -402,7 +408,8 @@ a:hover, a:focus { color: var(--sp-primary-700); }
   .sp-brand-text small { display: none; }
   .sp-live-badge { display: none; }
   .sp-hero { padding: 20px 15px; }
-  .sp-service-head { padding: 12px; }
+  .sp-service-head { padding: 7px 8px 7px 12px; }
+  a.sp-service-head { padding: 12px; }
   .sp-uptime-label { display: none; }
   .sp-stat b { font-size: 18px; }
 }

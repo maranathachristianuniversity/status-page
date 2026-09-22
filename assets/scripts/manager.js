@@ -51,6 +51,10 @@ $(function () {
 
     //on expand error display
     $(document).on('click', '.expand-service', function (evt) {
+        // action buttons live outside the toggle link, but guard anyway
+        if ($(evt.target).closest('.sp-promo-actions, .editMicroservices, .deleteMicroservices').length) {
+            return;
+        }
         evt.preventDefault();
         let id = $(this).attr('id');
         let area_expanded = $(this).attr('aria-expanded');
@@ -174,8 +178,10 @@ $(function () {
     });
 
     $('.div-microservices').on('click', '.editMicroservices', function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        let x = $(this).attr('id');
+        if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); }
+        let x = $(this).data('id') || $(this).attr('id');
         $.ajax({
             url: $('base#api').attr('href') + 'health/' + x,
             dataType: 'json',
@@ -265,8 +271,10 @@ $(function () {
     });
 
     $('.div-microservices').on('click', '.deleteMicroservices', function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        let x = $(this).attr('id');
+        if (e.stopImmediatePropagation) { e.stopImmediatePropagation(); }
+        let x = $(this).data('id') || $(this).attr('id');
         let delete_box = bootbox.dialog({
             title: 'Delete Microservice',
             message: 'Are you sure you want to delete this service?',
@@ -582,19 +590,21 @@ function init() {
                 let meta = statusMeta(val.healthstatus);
                 if (val.healthstatus === 'warning' || val.healthstatus === 'error') { totalissue++; }
                 accordion += `<div class="sp-service">
-                                <a id="${val.id}" class="sp-service-head expand-service" data-toggle="collapse" data-parent="#accordion" href="#collapse${val.id}">
-                                    <span class="sp-service-icon ${meta.iconCls}"><i class="fa ${meta.icon}"></i></span>
-                                    <span class="sp-service-name">
-                                        <strong>${esc(val.displayname)}</strong>
-                                        <small>${esc(val.description || '').substring(0, 90)}</small>
-                                    </span>
+                                <div class="sp-service-head">
+                                    <a id="${val.id}" class="sp-service-main expand-service" data-toggle="collapse" data-parent="#accordion" href="#collapse${val.id}">
+                                        <span class="sp-service-icon ${meta.iconCls}"><i class="fa ${meta.icon}"></i></span>
+                                        <span class="sp-service-name">
+                                            <strong>${esc(val.displayname)}</strong>
+                                            <small>${esc(val.description || '').substring(0, 90)}</small>
+                                        </span>
+                                        <span class="sp-pill ${meta.pill}">${meta.label}</span>
+                                        <i class="fa fa-chevron-down sp-chevron"></i>
+                                    </a>
                                     <span class="sp-promo-actions">
-                                        <span class="sp-icon-btn editMicroservices" title="Edit" id="${val.id}"><i class="fa fa-pencil"></i></span>
-                                        <span class="sp-icon-btn deleteMicroservices" title="Delete" id="${val.id}"><i class="fa fa-trash"></i></span>
+                                        <button type="button" class="sp-icon-btn editMicroservices" title="Edit" data-id="${val.id}"><i class="fa fa-pencil"></i></button>
+                                        <button type="button" class="sp-icon-btn deleteMicroservices" title="Delete" data-id="${val.id}"><i class="fa fa-trash"></i></button>
                                     </span>
-                                    <span class="sp-pill ${meta.pill}">${meta.label}</span>
-                                    <i class="fa fa-chevron-down sp-chevron"></i>
-                                </a>
+                                </div>
                                 <div id="collapse${val.id}" class="panel-collapse collapse">
                                     <div class="sp-service-body">
                                         <p style="margin:0 0 4px;">${esc(val.description || 'No description provided.')}</p>
